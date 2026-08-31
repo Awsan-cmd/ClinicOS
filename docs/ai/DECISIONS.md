@@ -170,3 +170,32 @@ Relative TypeScript imports use `.js` extensions where required by the NodeNext/
 Reason:
 
 The repository uses ESM-compatible TypeScript configuration, where runtime-relative imports must resolve with explicit extensions.
+---
+
+## Decision 014 — Tenant-Bound Sessions
+
+ClinicOS sessions explicitly store both `user_id` and `tenant_id`.
+
+Reason:
+
+Authentication state must remain associated with the tenant security boundary and must not rely solely on the user relationship.
+
+---
+
+## Decision 015 — Hashed Session Tokens
+
+ClinicOS persists only a hash of the session token.
+
+Reason:
+
+A database compromise must not directly expose usable session credentials.
+
+---
+
+## Decision 016 — Explicit Session Revocation
+
+Sessions support explicit revocation through `revoked_at`.
+
+Reason:
+
+Security-sensitive sessions must be invalidatable before their natural expiration, including logout, account deactivation, device revocation, or incident response.

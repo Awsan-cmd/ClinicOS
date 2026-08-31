@@ -8,7 +8,8 @@
   },
   "exports": {
     "./client": "./src/client.ts",
-    "./migrator": "./src/migrator.ts"
+    "./migrator": "./src/migrator.ts",
+    "./sessions": "./src/sessions.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

@@ -17,6 +17,14 @@ Phase 1 — Platform / Identity and Security Foundation.
 - Continuous documentation and recovery-point policy established.
 - Phase 1A database foundation completed and validated.
 - Phase 1B identity foundation implemented and validated.
+- Phase 1C session foundation implemented and validated.
+- Session identity is bound to user and tenant context.
+- Session expiration and explicit revocation are supported.
+- Raw session tokens are not persisted; only token hashes are stored.
+- Transaction-safe database migration `0002_sessions.sql` added.
+- Session persistence helpers added to `@clinicos/db`.
+- Current implementation recovery point is pending commit.
+
 - User identity and application role types added.
 - Authentication request/response contracts added.
 - Authenticated users are explicitly bound to `TenantContext`.
@@ -28,7 +36,7 @@ Phase 1 — Platform / Identity and Security Foundation.
 - Node.js and PostgreSQL TypeScript definitions added for workspace type safety.
 - Current implementation recovery point is pending commit.
 
-- Current repository recovery point: commit `6dd66fa`.
+- Current repository recovery point is maintained by the latest verified commit.
 
 ## Documentation System
 

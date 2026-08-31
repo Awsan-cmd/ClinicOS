@@ -325,3 +325,39 @@ Validation after correction:
 - Git diff check passed
 
 The task is ready for commit and remote recovery-point verification.
+---
+
+## 2026-08-31 — Phase 1C Session Foundation
+
+Added the initial authenticated-session persistence layer.
+
+Added:
+
+- `SessionId`
+- `UserSession`
+- session creation contract
+- session response contract
+- session revocation contract
+- `sessions` database table
+- session indexes
+- token-hash persistence
+- expiration tracking
+- explicit revocation tracking
+- session persistence helpers
+- Phase 1 session tests
+
+Security properties:
+
+- sessions are bound to users and tenants
+- raw session tokens are not stored
+- sessions can be explicitly revoked
+- expired sessions can be indexed and evaluated efficiently
+
+Validation:
+
+- typecheck passed
+- lint passed
+- 14 tests passed
+- Git diff check passed
+
+The task is ready for commit and remote recovery-point verification.

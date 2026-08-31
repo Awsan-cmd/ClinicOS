@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     "./tenant": "./src/tenant.ts",
-    "./identity": "./src/identity.ts"
+    "./identity": "./src/identity.ts",
+    "./session": "./src/session.ts"
   }
 }
