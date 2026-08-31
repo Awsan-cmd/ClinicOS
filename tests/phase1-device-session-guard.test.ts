@@ -22,6 +22,9 @@ describe("ClinicOS Phase 1I device session enforcement", () => {
 
     expect(source).toContain("export async function checkDeviceSession");
     expect(source).toContain("WHERE ds.id = $1");
+    expect(source).toContain("AND ds.tenant_id = $2");
+    expect(source).toContain("AND ds.device_id = $3");
+    expect(source).toContain("AND ds.user_id = $4");
   });
 
   it("enforces tenant isolation", () => {
@@ -31,7 +34,7 @@ describe("ClinicOS Phase 1I device session enforcement", () => {
     );
 
     expect(source).toContain("tenant_mismatch");
-    expect(source).toContain("row.tenant_id !== input.tenantId");
+    expect(source).toContain("AND ds.tenant_id = $2");
   });
 
   it("enforces device and user identity", () => {
@@ -41,8 +44,8 @@ describe("ClinicOS Phase 1I device session enforcement", () => {
     );
 
     expect(source).toContain("identity_mismatch");
-    expect(source).toContain("row.device_id !== input.deviceId");
-    expect(source).toContain("row.user_id !== input.userId");
+    expect(source).toContain("AND ds.device_id = $3");
+    expect(source).toContain("AND ds.user_id = $4");
   });
 
   it("rejects revoked and expired sessions", () => {

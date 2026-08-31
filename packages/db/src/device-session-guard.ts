@@ -58,9 +58,17 @@ export async function checkDeviceSession(
        AND da.tenant_id = ds.tenant_id
        AND da.status = 'active'
       WHERE ds.id = $1
+        AND ds.tenant_id = $2
+        AND ds.device_id = $3
+        AND ds.user_id = $4
       LIMIT 1
     `,
-    [input.sessionId],
+    [
+      input.sessionId,
+      input.tenantId,
+      input.deviceId,
+      input.userId,
+    ],
   );
 
   if (result.rowCount !== 1) {
@@ -80,23 +88,6 @@ export async function checkDeviceSession(
     device_status: string | null;
     access_status: string | null;
   };
-
-  if (row.tenant_id !== input.tenantId) {
-    return {
-      allowed: false,
-      reason: "tenant_mismatch",
-    };
-  }
-
-  if (
-    row.device_id !== input.deviceId ||
-    row.user_id !== input.userId
-  ) {
-    return {
-      allowed: false,
-      reason: "identity_mismatch",
-    };
-  }
 
   if (row.session_status !== "active") {
     return {
