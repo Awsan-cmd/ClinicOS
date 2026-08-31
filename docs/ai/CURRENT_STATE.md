@@ -18,6 +18,14 @@ Phase 1 — Platform / Identity and Security Foundation.
 - Phase 1A database foundation completed and validated.
 - Phase 1B identity foundation implemented and validated.
 - Phase 1C session foundation implemented and validated.
+- Phase 1D RBAC foundation implemented and validated.
+- Application permissions are represented as strongly typed permission identifiers.
+- Initial role-to-permission matrix defined for owner, admin, manager, doctor, receptionist, and nurse.
+- Authorization checks deny inactive users.
+- Authorization checks deny permissions not assigned to the user's role.
+- Authorization context remains explicitly tenant-bound and may include branch context.
+- Current implementation recovery point is pending commit.
+
 - Session identity is bound to user and tenant context.
 - Session expiration and explicit revocation are supported.
 - Raw session tokens are not persisted; only token hashes are stored.

@@ -6,6 +6,7 @@
   "exports": {
     "./tenant": "./src/tenant.ts",
     "./identity": "./src/identity.ts",
-    "./session": "./src/session.ts"
+    "./session": "./src/session.ts",
+    "./permission": "./src/permission.ts"
   }
 }

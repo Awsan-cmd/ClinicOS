@@ -361,3 +361,45 @@ Validation:
 - Git diff check passed
 
 The task is ready for commit and remote recovery-point verification.
+---
+
+## 2026-08-31 — Phase 1D RBAC Foundation
+
+Added the initial role-based authorization layer.
+
+Added:
+
+- `Permission`
+- centralized `ROLE_PERMISSIONS`
+- `AuthorizationContext`
+- `AuthorizationResult`
+- `hasPermission`
+- `authorize`
+- `@clinicos/auth` workspace
+- RBAC tests
+
+Initial roles:
+
+- owner
+- admin
+- manager
+- doctor
+- receptionist
+- nurse
+
+Authorization properties:
+
+- permissions are strongly typed
+- role permissions are centralized
+- inactive users are denied
+- missing permissions are denied
+- tenant context remains part of authorization context
+
+Validation:
+
+- typecheck passed
+- lint passed
+- 20 tests passed
+- Git diff check passed
+
+The task is ready for commit and remote recovery-point verification.

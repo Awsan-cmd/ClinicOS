@@ -199,3 +199,32 @@ Sessions support explicit revocation through `revoked_at`.
 Reason:
 
 Security-sensitive sessions must be invalidatable before their natural expiration, including logout, account deactivation, device revocation, or incident response.
+---
+
+## Decision 017 — Explicit Permission Vocabulary
+
+ClinicOS authorization uses explicit typed permission identifiers such as `patient:read`, `patient:manage`, and `clinical:manage`.
+
+Reason:
+
+A stable permission vocabulary provides a predictable authorization boundary and avoids scattering ad-hoc role checks throughout application code.
+
+---
+
+## Decision 018 — Role-to-Permission Matrix
+
+ClinicOS uses a centralized role-to-permission matrix for the initial application roles.
+
+Reason:
+
+Authorization policy should be centralized and reviewable rather than duplicated across individual features.
+
+---
+
+## Decision 019 — Inactive Users Are Always Denied
+
+Authorization rejects inactive users before evaluating role permissions.
+
+Reason:
+
+Account activation state is a security boundary and must not be bypassed by an otherwise valid role assignment.

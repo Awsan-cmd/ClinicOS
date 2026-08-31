@@ -1,0 +1,16 @@
+{
+  "name": "@clinicos/auth",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@clinicos/types": "0.1.0"
+  },
+  "exports": {
+    "./authorization": "./src/authorization.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint ."
+  }
+}
