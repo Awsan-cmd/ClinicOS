@@ -1,7 +1,7 @@
 # ClinicOS Current State
 
 ## Current Stage
-Sprint 0 — Repository Foundation.
+Sprint 0 — Repository Foundation / Tooling Foundation.
 
 ## Completed In This Sprint
 - Created the initial monorepo directory structure.
@@ -16,26 +16,47 @@ Sprint 0 — Repository Foundation.
   - `packages/config`
   - `packages/contracts`
   - `packages/types`
-- Generated `package-lock.json` with `npm install --package-lock-only`.
-- Validated all package JSON files.
-- Verified the lockfile contains all six workspaces.
-- Ran `git diff --check` successfully.
-- Confirmed no secrets were present in the new files.
-- Confirmed `node_modules` was not created.
+- Generated and validated `package-lock.json`.
+- Installed development tooling:
+  - TypeScript
+  - ESLint
+  - `@eslint/js`
+  - `typescript-eslint`
+  - Vitest
+- Added ESLint flat configuration.
+- Added the root Vitest smoke test.
+- Configured the root `test` script to execute Vitest directly.
+- Verified TypeScript typechecking successfully.
+- Verified ESLint successfully.
+- Verified the Vitest smoke test successfully.
+- Verified `git diff --check`.
+- Verified npm audit reports zero vulnerabilities.
+- Verified the development environment on Linux.
 
 ## Current Repository State
-Repository foundation is in progress.
+Repository foundation and tooling foundation are implemented and verified.
 No application runtime, database schema, Docker environment, CI workflow, or production dependencies have been implemented yet.
 
 ## Environment Verified
-- Node.js: v26.4.0
+- OS: Ubuntu 26.04.1 LTS
+- Node.js: v26.8.1
 - npm: 11.19.0
-- Git: 2.55.0
-- Platform: Android arm64
+- Git: 2.53.0
+- Docker: 29.7.2
+- Docker Compose: 5.5.0
 - Branch: main
 
+## Verification
+- `npm run typecheck` — PASS
+- `npm run lint` — PASS
+- `npm test` — PASS
+- Smoke tests: 1 passed
+- `git diff --check` — PASS
+- npm audit — 0 vulnerabilities
+
 ## Next Task
-Continue Sprint 0 with the next repository-foundation task after this state is committed and verified.
+Continue Sprint 0 with local infrastructure:
+Docker Compose, PostgreSQL, Redis, environment configuration, and health checks.
 
 ## Important Constraints
 - Modular monolith + async workers first.
