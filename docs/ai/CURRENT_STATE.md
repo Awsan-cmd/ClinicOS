@@ -2,7 +2,7 @@
 
 ## Current Stage
 
-Sprint 0 — Repository Foundation / Tooling Foundation.
+Phase 1 — Platform / Identity and Security Foundation.
 
 ## Completed In This Sprint
 
@@ -12,6 +12,10 @@ Sprint 0 — Repository Foundation / Tooling Foundation.
 - ESLint and ESLint flat configuration.
 - Vitest and root smoke test.
 - Verified typecheck, lint, and test execution.
+- Phase 0 infrastructure foundation completed and pushed.
+- Phase 1 tenancy foundation completed and pushed.
+- Continuous documentation and recovery-point policy established.
+- Current repository recovery point: commit `6dd66fa`.
 
 ## Documentation System
 
