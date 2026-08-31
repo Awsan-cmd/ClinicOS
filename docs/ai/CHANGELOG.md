@@ -565,3 +565,45 @@ Validation:
 - Git diff check passed
 
 The task is ready for staging and commit.
+---
+
+## 2026-08-31 — Phase 1I Device Session Enforcement Foundation
+
+Added the centralized device-session authorization guard.
+
+Added:
+
+- `DeviceSessionGuardResult`
+- device-session guard request/response contracts
+- `checkDeviceSession`
+- tenant isolation enforcement
+- device identity enforcement
+- user identity enforcement
+- session lifecycle enforcement
+- session expiration enforcement
+- device lifecycle enforcement
+- active device-access enforcement
+- explicit denial reasons
+- Phase 1I enforcement tests
+
+Security properties:
+
+- session identity is checked first
+- tenant identity must match
+- device identity must match
+- user identity must match
+- revoked sessions are denied
+- expired sessions are denied
+- revoked devices are denied
+- revoked device access is denied
+- device and access joins remain tenant-scoped
+- authorization succeeds only after every required check passes
+
+Validation:
+
+- typecheck passed
+- lint passed
+- 58 tests passed
+- Git diff check passed
+
+The task is ready for staging and commit.

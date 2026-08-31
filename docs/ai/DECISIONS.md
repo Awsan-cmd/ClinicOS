@@ -354,3 +354,42 @@ Device session revocation requires both the session identity and tenant identity
 Reason:
 
 Tenant isolation must apply to lifecycle mutations as well as session reads and activity checks.
+---
+
+## Decision 033 — Device Session Enforcement Is Centralized
+
+Device session authorization is evaluated through a dedicated guard that validates session, tenant, device, user, device lifecycle, and device-access state.
+
+Reason:
+
+Security-critical session checks should have one explicit enforcement boundary rather than being duplicated across callers.
+
+---
+
+## Decision 034 — Tenant, Device, and User Identity Must Match
+
+A device session is allowed only when the supplied tenant, device, and user identities exactly match the persisted session relationship.
+
+Reason:
+
+Authentication state must never be usable across tenants or by a different device or user.
+
+---
+
+## Decision 035 — Authorization Requires Current Device State
+
+A session is denied when its device is no longer active or its device-access relationship is no longer active.
+
+Reason:
+
+Session validity depends on the current authorization and enrollment state, not only on the original session creation state.
+
+---
+
+## Decision 036 — Expired Sessions Are Denied at Enforcement Time
+
+Session authorization checks compare `expires_at` against the current time and deny expired sessions.
+
+Reason:
+
+Expiration must be enforced at the authorization boundary even if an explicit lifecycle transition has not yet marked the record as expired.

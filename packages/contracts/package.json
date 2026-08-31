@@ -13,6 +13,7 @@
     "./audit": "./src/audit.ts",
     "./device": "./src/device.ts",
     "./device-access": "./src/device-access.ts",
-    "./device-session": "./src/device-session.ts"
+    "./device-session": "./src/device-session.ts",
+    "./device-session-guard": "./src/device-session-guard.ts"
   }
 }
