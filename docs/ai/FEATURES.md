@@ -34,3 +34,28 @@ Multi-tenancy, auth/RBAC, clinic/branches, patients, scheduling, clinical, denta
 None.
 
 A feature becomes COMPLETED only after implementation, testing, review, and verification.
+
+## ANDROID / TELEPHONY ARCHITECTURE
+
+Planned from the beginning:
+
+- First-party ClinicOS Android application.
+- Broad Android compatibility strategy.
+- Android 5–8 compatibility target where technically feasible.
+- Modern Android support.
+- Device registration and authentication.
+- Permission/capability reporting.
+- Incoming calls.
+- Outgoing calls.
+- SMS send/receive.
+- Call/SMS synchronization.
+- Android Telephony Gateway.
+- Realtime Voice Gateway.
+- Bidirectional realtime audio architecture.
+- Device health/heartbeat.
+- Offline/reconnect handling.
+- Remote device revocation.
+
+Implementation is deferred to the Channels/Voice phases.
+
+A feature becomes COMPLETED only after implementation, testing, review, and verification.
