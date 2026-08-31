@@ -257,3 +257,32 @@ The initial audit persistence layer exposes event creation but no update or dele
 Reason:
 
 Audit history should be treated as an append-only record of security and application activity.
+---
+
+## Decision 023 — Independently Identified Clinic Devices
+
+ClinicOS devices have their own `DeviceId` and lifecycle state rather than relying only on tenant identity.
+
+Reason:
+
+A device is a security principal and must be independently identifiable and revocable.
+
+---
+
+## Decision 024 — Explicit Device Capability Model
+
+ClinicOS represents device capabilities explicitly, including telephony, SMS, microphone, audio, realtime, notifications, and background execution.
+
+Reason:
+
+Android capabilities vary by OS version, device, OEM, permissions, and runtime state. The platform must not assume that every enrolled device supports every capability.
+
+---
+
+## Decision 025 — Active-Only Device Heartbeats
+
+Device heartbeat updates are applied only to devices whose status is `active`.
+
+Reason:
+
+A revoked device must not be able to refresh operational state or appear healthy after revocation.

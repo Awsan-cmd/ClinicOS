@@ -20,6 +20,15 @@ Phase 1 — Platform / Identity and Security Foundation.
 - Phase 1C session foundation implemented and validated.
 - Phase 1D RBAC foundation implemented and validated.
 - Phase 1E audit foundation implemented and validated.
+- Phase 1F device identity and capability foundation implemented and validated.
+- Devices are explicitly tenant-bound and may be branch-bound.
+- Android platform identity includes API level and app version.
+- Device capabilities are explicitly represented.
+- Device connectivity and heartbeat state are persisted.
+- Devices support explicit revocation.
+- Heartbeat updates are accepted only for active devices.
+- Current implementation recovery point is pending commit.
+
 - Audit events are explicitly tenant-bound.
 - Audit events may attribute actions to users and branches.
 - Structured audit metadata is stored as JSONB.

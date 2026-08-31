@@ -8,6 +8,7 @@
     "./identity": "./src/identity.ts",
     "./session": "./src/session.ts",
     "./permission": "./src/permission.ts",
-    "./audit": "./src/audit.ts"
+    "./audit": "./src/audit.ts",
+    "./device": "./src/device.ts"
   }
 }

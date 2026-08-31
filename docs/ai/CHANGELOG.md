@@ -439,3 +439,47 @@ Validation:
 - Git diff check passed
 
 The task is ready for staging and commit.
+---
+
+## 2026-08-31 — Phase 1F Device Identity and Capability Foundation
+
+Added the initial ClinicOS device identity layer.
+
+Added:
+
+- `DeviceId`
+- `DeviceStatus`
+- `DeviceCapability`
+- `DeviceConnectivity`
+- `ClinicDevice`
+- device enrollment contract
+- device revocation contract
+- device heartbeat contract
+- `devices` database table
+- tenant and branch binding
+- Android API level tracking
+- app version tracking
+- capability state
+- connectivity state
+- heartbeat tracking
+- explicit device revocation
+- device persistence helpers
+- Phase 1F device tests
+
+Security properties:
+
+- devices have independent identities
+- every device is tenant-bound
+- branch binding is explicit and optional
+- revoked devices cannot receive heartbeat updates
+- device capabilities are represented explicitly
+- device lifecycle state is persisted
+
+Validation:
+
+- typecheck passed
+- lint passed
+- 33 tests passed
+- Git diff check passed
+
+The task is ready for staging and commit.
