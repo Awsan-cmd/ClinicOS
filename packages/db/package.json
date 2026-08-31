@@ -9,7 +9,8 @@
   "exports": {
     "./client": "./src/client.ts",
     "./migrator": "./src/migrator.ts",
-    "./sessions": "./src/sessions.ts"
+    "./sessions": "./src/sessions.ts",
+    "./audit": "./src/audit.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

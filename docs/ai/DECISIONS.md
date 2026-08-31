@@ -228,3 +228,32 @@ Authorization rejects inactive users before evaluating role permissions.
 Reason:
 
 Account activation state is a security boundary and must not be bypassed by an otherwise valid role assignment.
+---
+
+## Decision 020 — Tenant-Bound Audit Events
+
+ClinicOS audit events must contain a mandatory `tenant_id`.
+
+Reason:
+
+Audit history is part of the tenant security boundary and must never be treated as a global unscoped event stream.
+
+---
+
+## Decision 021 — Structured Audit Metadata
+
+ClinicOS audit events support structured metadata stored as JSONB.
+
+Reason:
+
+Security and operational events may require contextual information without repeatedly changing the audit schema for every feature.
+
+---
+
+## Decision 022 — Append-Only Audit Persistence API
+
+The initial audit persistence layer exposes event creation but no update or delete helper.
+
+Reason:
+
+Audit history should be treated as an append-only record of security and application activity.

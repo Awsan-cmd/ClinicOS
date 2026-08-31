@@ -7,6 +7,7 @@
     "./tenant": "./src/tenant.ts",
     "./identity": "./src/identity.ts",
     "./session": "./src/session.ts",
-    "./permission": "./src/permission.ts"
+    "./permission": "./src/permission.ts",
+    "./audit": "./src/audit.ts"
   }
 }

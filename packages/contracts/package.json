@@ -9,6 +9,7 @@
   "exports": {
     "./tenant": "./src/tenant.ts",
     "./auth": "./src/auth.ts",
-    "./session": "./src/session.ts"
+    "./session": "./src/session.ts",
+    "./audit": "./src/audit.ts"
   }
 }

@@ -19,6 +19,14 @@ Phase 1 — Platform / Identity and Security Foundation.
 - Phase 1B identity foundation implemented and validated.
 - Phase 1C session foundation implemented and validated.
 - Phase 1D RBAC foundation implemented and validated.
+- Phase 1E audit foundation implemented and validated.
+- Audit events are explicitly tenant-bound.
+- Audit events may attribute actions to users and branches.
+- Structured audit metadata is stored as JSONB.
+- Audit persistence exposes creation only; no update/delete helper is provided.
+- Audit retrieval is indexed by tenant and creation time.
+- Current implementation recovery point is pending commit.
+
 - Application permissions are represented as strongly typed permission identifiers.
 - Initial role-to-permission matrix defined for owner, admin, manager, doctor, receptionist, and nurse.
 - Authorization checks deny inactive users.

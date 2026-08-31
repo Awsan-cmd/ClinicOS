@@ -403,3 +403,39 @@ Validation:
 - Git diff check passed
 
 The task is ready for commit and remote recovery-point verification.
+---
+
+## 2026-08-31 — Phase 1E Audit Foundation
+
+Added the initial audit-event foundation.
+
+Added:
+
+- `AuditEventId`
+- `AuditAction`
+- `AuditResource`
+- `AuditEvent`
+- audit creation contract
+- audit response contract
+- `audit_events` database table
+- tenant, user, branch, resource and creation-time indexes
+- structured JSONB metadata
+- audit persistence helper
+- Phase 1 audit tests
+
+Security properties:
+
+- every audit event is tenant-bound
+- user and branch attribution are supported
+- structured metadata is retained
+- persistence exposes creation only
+- no application update/delete helper exists for audit events
+
+Validation:
+
+- typecheck passed
+- lint passed
+- 26 tests passed
+- Git diff check passed
+
+The task is ready for staging and commit.
