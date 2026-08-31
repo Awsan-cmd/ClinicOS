@@ -244,4 +244,4 @@ The application must use a compatibility layer instead of assuming one Android A
 
 Required architecture:
 
-- 
+-

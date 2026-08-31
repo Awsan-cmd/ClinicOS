@@ -54,4 +54,4 @@ Compatibility is implemented through capability detection and adapter interfaces
 
 The future application should be organized around explicit modules such as:
 
-- 
+-
