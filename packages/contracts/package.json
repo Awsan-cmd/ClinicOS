@@ -11,6 +11,7 @@
     "./auth": "./src/auth.ts",
     "./session": "./src/session.ts",
     "./audit": "./src/audit.ts",
-    "./device": "./src/device.ts"
+    "./device": "./src/device.ts",
+    "./device-access": "./src/device-access.ts"
   }
 }

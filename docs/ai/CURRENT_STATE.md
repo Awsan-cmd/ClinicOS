@@ -21,6 +21,14 @@ Phase 1 — Platform / Identity and Security Foundation.
 - Phase 1D RBAC foundation implemented and validated.
 - Phase 1E audit foundation implemented and validated.
 - Phase 1F device identity and capability foundation implemented and validated.
+- Phase 1G device access foundation implemented and validated.
+- Device access is explicitly bound to tenant, device, and user.
+- Device access may be branch-scoped.
+- Device access supports explicit revocation.
+- Active device access is required for access checks.
+- No general-purpose device access update helper is exposed.
+- Current implementation recovery point is pending commit.
+
 - Devices are explicitly tenant-bound and may be branch-bound.
 - Android platform identity includes API level and app version.
 - Device capabilities are explicitly represented.

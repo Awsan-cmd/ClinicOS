@@ -11,7 +11,8 @@
     "./migrator": "./src/migrator.ts",
     "./sessions": "./src/sessions.ts",
     "./audit": "./src/audit.ts",
-    "./devices": "./src/devices.ts"
+    "./devices": "./src/devices.ts",
+    "./device-access": "./src/device-access.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

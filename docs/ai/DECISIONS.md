@@ -286,3 +286,32 @@ Device heartbeat updates are applied only to devices whose status is `active`.
 Reason:
 
 A revoked device must not be able to refresh operational state or appear healthy after revocation.
+---
+
+## Decision 026 — Device Access Is a Separate Security Relationship
+
+ClinicOS represents device access as an explicit relationship between tenant, device, and user.
+
+Reason:
+
+Device identity and user identity are separate security principals. Explicit access records make grants and revocations auditable and independently enforceable.
+
+---
+
+## Decision 027 — Device Access May Be Branch-Scoped
+
+Device access may optionally include a branch context.
+
+Reason:
+
+A clinic may restrict a user's device access to a particular branch while preserving tenant-level ownership.
+
+---
+
+## Decision 028 — Revoked Device Access Is Not Active
+
+Device access checks consider only records with `status = 'active'`.
+
+Reason:
+
+Revocation must immediately remove the access relationship without deleting historical attribution.

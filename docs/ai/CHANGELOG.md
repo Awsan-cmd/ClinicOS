@@ -483,3 +483,41 @@ Validation:
 - Git diff check passed
 
 The task is ready for staging and commit.
+---
+
+## 2026-08-31 — Phase 1G Device Access Foundation
+
+Added the initial secure device-access relationship layer.
+
+Added:
+
+- `DeviceAccessId`
+- `DeviceAccessStatus`
+- `DeviceAccess`
+- device access grant contract
+- device access revocation contract
+- `device_access` database table
+- tenant/device/user binding
+- optional branch scoping
+- explicit access revocation
+- active-access verification helper
+- tenant/device and tenant/user lookup indexes
+- Phase 1G device access tests
+
+Security properties:
+
+- device access is tenant-bound
+- access is explicitly tied to a device and user
+- branch scope is explicit when required
+- revoked access is excluded from active-access checks
+- historical access records are retained
+- no general-purpose update helper is exposed
+
+Validation:
+
+- typecheck passed
+- lint passed
+- 40 tests passed
+- Git diff check passed
+
+The task is ready for staging and commit.
