@@ -642,3 +642,28 @@ Validation:
 - Git diff check passed
 
 The task is ready for staging and commit.
+---
+
+## 2026-08-31 — Phase 1K Device Session Lifecycle Hardening
+
+Hardened device-session lifecycle validation.
+
+Added test coverage ensuring:
+
+- session touch is tenant-scoped
+- session touch is device-scoped
+- session touch is user-scoped
+- revoked sessions cannot be touched
+- expired sessions cannot be touched
+- revoked device access prevents session touch
+- revoked devices prevent session touch
+- active-session validation rechecks current authorization state
+
+Validation:
+
+- typecheck passed
+- lint passed
+- 73 tests passed
+- Git diff check passed
+
+The implementation is ready for staging and commit.

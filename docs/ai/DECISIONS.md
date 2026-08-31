@@ -432,3 +432,22 @@ Propagation updates only sessions whose status is currently `active`.
 Reason:
 
 Historical revoked sessions should remain historical records and should not receive unnecessary lifecycle mutations.
+---
+
+## Decision 041 — Session Touch Revalidates Current Authorization
+
+A device session may be touched only when the session is active and non-expired and the associated device and device-access relationship are currently active.
+
+Reason:
+
+A valid session must not become a mechanism for retaining authorization after its underlying device authorization has been revoked.
+
+---
+
+## Decision 042 — Session Lifecycle Operations Remain Tenant and Identity Scoped
+
+Session lifecycle operations require matching tenant, device, and user identity.
+
+Reason:
+
+Session identifiers alone must never permit cross-tenant or cross-identity session manipulation.

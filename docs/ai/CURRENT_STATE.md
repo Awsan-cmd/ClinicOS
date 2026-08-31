@@ -25,6 +25,15 @@ Phase 1 — Platform / Identity and Security Foundation.
 - Phase 1H device session foundation implemented and validated.
 - Phase 1I device session enforcement foundation implemented and validated.
 - Phase 1J device-session revocation propagation implemented and validated.
+- Phase 1K device-session lifecycle hardening implemented and validated.
+- Session touch requires matching tenant, device, and user identity.
+- Session touch requires active, non-expired session state.
+- Session touch requires current active device access.
+- Session touch requires current active device state.
+- Active-session validation rechecks current authorization state.
+- Cross-tenant session operations remain denied.
+- Current implementation recovery point is pending commit.
+
 - Revoking device access immediately revokes matching active device sessions.
 - Revoking a device immediately revokes matching active device sessions.
 - Device-access revocation is tenant-scoped.

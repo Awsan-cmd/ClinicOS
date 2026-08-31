@@ -106,6 +106,105 @@ describe("ClinicOS Phase 1H device session foundation", () => {
     expect(migration).toContain("device_sessions_expires_at_idx");
   });
 
+
+
+  it("does not allow touching a session across tenants", () => {
+    const source = readFileSync(
+      "packages/db/src/device-session.ts",
+      "utf8",
+    );
+
+    expect(source).toContain("WHERE id = $1");
+    expect(source).toContain("AND tenant_id = $2");
+    expect(source).toContain("AND device_id = $3");
+    expect(source).toContain("AND user_id = $4");
+  });
+
+  it("does not touch a revoked session", () => {
+    const source = readFileSync(
+      "packages/db/src/device-session.ts",
+      "utf8",
+    );
+
+    expect(source).toContain("AND status = 'active'");
+  });
+
+  it("does not touch an expired session", () => {
+    const source = readFileSync(
+      "packages/db/src/device-session.ts",
+      "utf8",
+    );
+
+    expect(source).toContain("AND expires_at > NOW()");
+  });
+
+  it("does not touch a session after device access is revoked", () => {
+    const source = readFileSync(
+      "packages/db/src/device-session.ts",
+      "utf8",
+    );
+
+    expect(source).toContain("FROM device_access");
+    expect(source).toContain("AND tenant_id = $2");
+    expect(source).toContain("AND device_id = $3");
+    expect(source).toContain("AND user_id = $4");
+    expect(source).toContain("AND status = 'active'");
+  });
+
+  it("does not touch a session after the device is revoked", () => {
+    const source = readFileSync(
+      "packages/db/src/device-session.ts",
+      "utf8",
+    );
+
+    expect(source).toContain("FROM devices");
+    expect(source).toContain("WHERE id = $3");
+    expect(source).toContain("AND tenant_id = $2");
+    expect(source).toContain("AND status = 'active'");
+  });
+
+  it("checks current authorization state instead of trusting session state alone", () => {
+    const source = readFileSync(
+      "packages/db/src/device-session.ts",
+      "utf8",
+    );
+
+    const touchStart = source.indexOf(
+      "export async function touchDeviceSession",
+    );
+    const touchEnd = source.indexOf(
+      "export async function hasActiveDeviceSession",
+    );
+
+    expect(touchStart).toBeGreaterThanOrEqual(0);
+    expect(touchEnd).toBeGreaterThan(touchStart);
+
+    const touchSource = source.slice(touchStart, touchEnd);
+
+    expect(touchSource).toContain("FROM device_access");
+    expect(touchSource).toContain("FROM devices");
+    expect(touchSource).toContain("expires_at > NOW()");
+  });
+
+  it("checks current authorization state when validating an active session", () => {
+    const source = readFileSync(
+      "packages/db/src/device-session.ts",
+      "utf8",
+    );
+
+    const start = source.indexOf(
+      "export async function hasActiveDeviceSession",
+    );
+
+    expect(start).toBeGreaterThanOrEqual(0);
+
+    const sessionSource = source.slice(start);
+
+    expect(sessionSource).toContain("FROM device_access");
+    expect(sessionSource).toContain("FROM devices");
+    expect(sessionSource).toContain("expires_at > NOW()");
+  });
+
   it("does not expose a general-purpose session update helper", () => {
     const source = readFileSync(
       "packages/db/src/device-session.ts",
