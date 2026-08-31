@@ -12,7 +12,8 @@
     "./sessions": "./src/sessions.ts",
     "./audit": "./src/audit.ts",
     "./devices": "./src/devices.ts",
-    "./device-access": "./src/device-access.ts"
+    "./device-access": "./src/device-access.ts",
+    "./device-session": "./src/device-session.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

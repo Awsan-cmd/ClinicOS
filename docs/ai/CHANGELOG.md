@@ -521,3 +521,47 @@ Validation:
 - Git diff check passed
 
 The task is ready for staging and commit.
+---
+
+## 2026-08-31 — Phase 1H Device Session Foundation
+
+Added the initial device-session lifecycle layer.
+
+Added:
+
+- `DeviceSessionId`
+- `DeviceSessionStatus`
+- `DeviceSession`
+- device session creation contract
+- device session revocation contract
+- device session touch contract
+- `device_sessions` database table
+- tenant/device/user binding
+- explicit session expiration
+- last-seen tracking
+- active-session verification
+- explicit session revocation
+- tenant/device and tenant/user lookup indexes
+- Phase 1H device session tests
+
+Security properties:
+
+- sessions are tenant-bound
+- sessions are tied to a specific device and user
+- session creation requires active device access
+- session creation requires an active device
+- expired sessions are rejected
+- revoked sessions cannot be touched
+- revoked device access prevents session activity
+- revoked devices prevent session activity
+- session revocation is tenant-scoped
+- no general-purpose update helper is exposed
+
+Validation:
+
+- typecheck passed
+- lint passed
+- 49 tests passed
+- Git diff check passed
+
+The task is ready for staging and commit.

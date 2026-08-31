@@ -22,6 +22,15 @@ Phase 1 — Platform / Identity and Security Foundation.
 - Phase 1E audit foundation implemented and validated.
 - Phase 1F device identity and capability foundation implemented and validated.
 - Phase 1G device access foundation implemented and validated.
+- Phase 1H device session foundation implemented and validated.
+- Device sessions are explicitly bound to tenant, device, and user.
+- Sessions require active device access and an active device at creation.
+- Sessions have explicit lifecycle state and expiration.
+- Session touch requires active access, active device state, and non-expired session state.
+- Session revocation is tenant-scoped.
+- No general-purpose device session update helper is exposed.
+- Current implementation recovery point is pending commit.
+
 - Device access is explicitly bound to tenant, device, and user.
 - Device access may be branch-scoped.
 - Device access supports explicit revocation.

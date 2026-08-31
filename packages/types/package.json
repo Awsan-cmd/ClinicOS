@@ -10,6 +10,7 @@
     "./permission": "./src/permission.ts",
     "./audit": "./src/audit.ts",
     "./device": "./src/device.ts",
-    "./device-access": "./src/device-access.ts"
+    "./device-access": "./src/device-access.ts",
+    "./device-session": "./src/device-session.ts"
   }
 }

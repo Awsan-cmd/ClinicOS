@@ -315,3 +315,42 @@ Device access checks consider only records with `status = 'active'`.
 Reason:
 
 Revocation must immediately remove the access relationship without deleting historical attribution.
+---
+
+## Decision 029 — Device Sessions Require Active Access
+
+A device session may be created only when the tenant/device/user relationship has active device access and the device itself is active.
+
+Reason:
+
+Authentication state must not outlive the authorization relationship or the enrolled device lifecycle.
+
+---
+
+## Decision 030 — Device Sessions Expire Explicitly
+
+Device sessions contain an explicit `expires_at` and active-session checks require the expiration time to be in the future.
+
+Reason:
+
+Device authentication must have a bounded lifetime and must not depend solely on explicit revocation.
+
+---
+
+## Decision 031 — Session Activity Requires Current Authorization
+
+Updating `last_seen_at` requires the session, device access relationship, and device to all remain active.
+
+Reason:
+
+A revoked device or revoked access relationship must immediately prevent continued session activity.
+
+---
+
+## Decision 032 — Session Revocation Is Tenant-Scoped
+
+Device session revocation requires both the session identity and tenant identity.
+
+Reason:
+
+Tenant isolation must apply to lifecycle mutations as well as session reads and activity checks.
