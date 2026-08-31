@@ -1,11 +1,105 @@
-# Decisions
-## ADR-001 — 2026-08-30
-Decision: repository docs are persistent project memory. Reason: chat is temporary. Status: Accepted.
-## ADR-002 — 2026-08-30
-Decision: modular monolith + async workers first. Reason: simpler initial delivery with scalable boundaries. Status: Accepted.
-## ADR-003 — 2026-08-30
-Decision: AI operates through controlled tools/permissions. Reason: model output must not become unrestricted privilege. Status: Accepted.
-## ADR-004 — 2026-08-30
-Decision: external providers use adapters. Reason: vendor replacement/availability/cost. Status: Accepted.
-## ADR-005 — 2026-08-30
-Decision: Arabic and English are first-class. Reason: target usability/market. Status: Accepted.
+# ClinicOS Architecture Decisions
+
+This file records important architectural and implementation decisions.
+
+## Decision 001 — Monorepo Structure
+
+ClinicOS uses an npm workspace monorepo with separate applications and shared packages.
+
+Current workspaces:
+
+- `apps/api`
+- `apps/web`
+- `apps/worker`
+- `packages/config`
+- `packages/contracts`
+- `packages/types`
+
+Reason:
+
+Keep application boundaries explicit while allowing shared contracts, types, and configuration to evolve centrally.
+
+---
+
+## Decision 002 — Multi-Tenant Foundation
+
+Tenant identity is a first-class architectural concern.
+
+Core entities include:
+
+- tenants
+- branches
+- users
+- devices
+
+Core records that belong to a tenant carry `tenant_id`.
+
+Reason:
+
+Tenant isolation must be enforced from the database and application layers rather than added later.
+
+---
+
+## Decision 003 — Explicit Tenant Context
+
+The application uses an explicit `TenantContext` containing:
+
+- `tenantId`
+- optional `branchId`
+
+Reason:
+
+Tenant and branch authorization must be resolved explicitly for requests, jobs, devices, and future realtime operations.
+
+---
+
+## Decision 004 — Branded TypeScript Identifiers
+
+Tenant, branch, user, and device identifiers use branded TypeScript string types.
+
+Reason:
+
+Prevent accidental interchange of semantically different identifiers during application development.
+
+---
+
+## Decision 005 — Vitest Configuration
+
+Vitest uses `vitest.config.mts`.
+
+Reason:
+
+The project uses ESM-compatible TypeScript configuration. The `.mts` extension avoids the configuration warning encountered with `vitest.config.ts` under the current module setup.
+
+---
+
+## Decision 006 — Infrastructure Foundation
+
+Development infrastructure is defined through Docker Compose with:
+
+- PostgreSQL
+- Redis
+- persistent volumes
+- health checks
+
+Environment defaults are documented in `.env.example`.
+
+Reason:
+
+Local infrastructure must be reproducible and aligned with the planned production architecture.
+
+---
+
+## Decision 007 — CI Foundation
+
+GitHub Actions validates:
+
+- dependency installation
+- typecheck
+- lint
+- tests
+- git diff integrity
+
+Reason:
+
+Every change should pass the same baseline validation before being accepted into `main`.
