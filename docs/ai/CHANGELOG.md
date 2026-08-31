@@ -249,3 +249,41 @@ Documentation is part of the implementation, not a post-development activity.
 Every significant implementation step must update the appropriate documentation before its commit is finalized.
 
 No major implementation work should begin from an uncommitted and undocumented state when the preceding task is expected to be complete.
+---
+
+## 2026-08-31 — Phase 1A Database Foundation
+
+Added the first dedicated database infrastructure layer.
+
+Added:
+
+- `@clinicos/db` workspace
+- PostgreSQL connection pool factory
+- migration loader
+- transactional migration runner
+- `schema_migrations` tracking
+- Phase 1A database tests
+- `@types/node`
+- `@types/pg`
+
+The migration runner:
+
+1. ensures the migration tracking table exists
+2. loads migrations in deterministic filename order
+3. skips already-applied migrations
+4. executes new migrations transactionally
+5. records successful migrations
+6. rolls back failed migrations
+
+Initial tenancy migration remains the first database migration.
+
+Validation:
+
+- npm install passed
+- PostgreSQL package linked successfully
+- typecheck passed
+- lint passed
+- 7 tests passed
+- Git diff check passed
+
+The task is ready for commit and remote recovery-point verification.

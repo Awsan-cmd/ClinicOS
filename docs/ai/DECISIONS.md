@@ -103,3 +103,34 @@ GitHub Actions validates:
 Reason:
 
 Every change should pass the same baseline validation before being accepted into `main`.
+---
+
+## Decision 008 — Dedicated Database Workspace
+
+ClinicOS uses a dedicated `@clinicos/db` workspace for PostgreSQL access and migration execution.
+
+Reason:
+
+Database connectivity and migration mechanics should have a clear boundary rather than being embedded directly inside the API application.
+
+---
+
+## Decision 009 — Transactional Migration Runner
+
+Database migrations are tracked in a `schema_migrations` table and each new migration is executed inside an explicit transaction.
+
+Reason:
+
+A migration must either complete fully or roll back without leaving a partially-applied schema state.
+
+Already-recorded migration identifiers are skipped.
+
+---
+
+## Decision 010 — Node/PostgreSQL Type Definitions
+
+The repository explicitly installs `@types/node` and `@types/pg`.
+
+Reason:
+
+The database and configuration packages use Node.js APIs and PostgreSQL types and therefore require explicit compile-time definitions under the project's strict TypeScript configuration.

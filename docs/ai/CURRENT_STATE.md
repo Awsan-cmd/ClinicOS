@@ -15,6 +15,12 @@ Phase 1 — Platform / Identity and Security Foundation.
 - Phase 0 infrastructure foundation completed and pushed.
 - Phase 1 tenancy foundation completed and pushed.
 - Continuous documentation and recovery-point policy established.
+- Phase 1A database foundation completed and validated.
+- PostgreSQL client pool and transactional migration runner added.
+- `schema_migrations` tracking prevents already-applied migrations from being re-executed.
+- Node.js and PostgreSQL TypeScript definitions added for workspace type safety.
+- Current implementation recovery point is pending commit.
+
 - Current repository recovery point: commit `6dd66fa`.
 
 ## Documentation System
