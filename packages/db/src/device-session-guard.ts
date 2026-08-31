@@ -33,6 +33,16 @@ export type DeviceSessionGuardResult =
   | DeviceSessionGuardAllowed
   | DeviceSessionGuardDenied;
 
+export class DeviceSessionAuthorizationError extends Error {
+  readonly reason: DeviceSessionGuardReason;
+
+  constructor(reason: DeviceSessionGuardReason) {
+    super(`Device session authorization failed: ${reason}`);
+    this.name = "DeviceSessionAuthorizationError";
+    this.reason = reason;
+  }
+}
+
 export async function checkDeviceSession(
   pool: Pool,
   input: DeviceSessionGuardInput,
@@ -138,4 +148,17 @@ export async function checkDeviceSession(
     userId: row.session_user_id,
     sessionId: row.id,
   };
+}
+
+export async function requireDeviceSession(
+  pool: Pool,
+  input: DeviceSessionGuardInput,
+): Promise<DeviceSessionGuardAllowed> {
+  const result = await checkDeviceSession(pool, input);
+
+  if (!result.allowed) {
+    throw new DeviceSessionAuthorizationError(result.reason);
+  }
+
+  return result;
 }

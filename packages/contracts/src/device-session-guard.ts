@@ -20,3 +20,8 @@ export interface RequireDeviceSessionRequest {
   deviceId: DeviceId;
   userId: UserId;
 }
+
+export type RequireDeviceSessionResponse = Extract<
+  DeviceSessionGuardResult,
+  { allowed: true }
+>;

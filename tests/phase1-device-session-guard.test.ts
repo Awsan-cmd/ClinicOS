@@ -132,6 +132,54 @@ describe("ClinicOS Phase 1I device session enforcement", () => {
     expect(source).toContain("result.rowCount !== 1");
   });
 
+
+
+  it("provides a reusable required-session enforcement helper", () => {
+    const source = readFileSync(
+      "packages/db/src/device-session-guard.ts",
+      "utf8",
+    );
+
+    expect(source).toContain(
+      "export async function requireDeviceSession",
+    );
+    expect(source).toContain(
+      "const result = await checkDeviceSession(pool, input)",
+    );
+    expect(source).toContain("if (!result.allowed)");
+    expect(source).toContain("return result");
+  });
+
+  it("throws a typed authorization error when enforcement fails", () => {
+    const source = readFileSync(
+      "packages/db/src/device-session-guard.ts",
+      "utf8",
+    );
+
+    expect(source).toContain(
+      "export class DeviceSessionAuthorizationError",
+    );
+    expect(source).toContain(
+      "readonly reason: DeviceSessionGuardReason",
+    );
+    expect(source).toContain(
+      "throw new DeviceSessionAuthorizationError(result.reason)",
+    );
+  });
+
+  it("defines a success-only response contract for required sessions", () => {
+    const source = readFileSync(
+      "packages/contracts/src/device-session-guard.ts",
+      "utf8",
+    );
+
+    expect(source).toContain(
+      "export type RequireDeviceSessionResponse",
+    );
+    expect(source).toContain("Extract<");
+    expect(source).toContain("{ allowed: true }");
+  });
+
   it("returns a positive authorization result only after all checks", () => {
     const source = readFileSync(
       "packages/db/src/device-session-guard.ts",
