@@ -41,9 +41,9 @@ export async function checkDeviceSession(
     `
       SELECT
         ds.id,
-        ds.tenant_id,
-        ds.device_id,
-        ds.user_id,
+        ds.tenant_id AS session_tenant_id,
+        ds.device_id AS session_device_id,
+        ds.user_id AS session_user_id,
         ds.status AS session_status,
         ds.expires_at,
         d.status AS device_status,
@@ -58,9 +58,6 @@ export async function checkDeviceSession(
        AND da.tenant_id = ds.tenant_id
        AND da.status = 'active'
       WHERE ds.id = $1
-        AND ds.tenant_id = $2
-        AND ds.device_id = $3
-        AND ds.user_id = $4
       LIMIT 1
     `,
     [
@@ -80,14 +77,31 @@ export async function checkDeviceSession(
 
   const row = result.rows[0] as {
     id: string;
-    tenant_id: string;
-    device_id: string;
-    user_id: string;
+    session_tenant_id: string;
+    session_device_id: string;
+    session_user_id: string;
     session_status: string;
     expires_at: Date | string;
     device_status: string | null;
     access_status: string | null;
   };
+
+  if (row.session_tenant_id !== input.tenantId) {
+    return {
+      allowed: false,
+      reason: "tenant_mismatch",
+    };
+  }
+
+  if (
+    row.session_device_id !== input.deviceId ||
+    row.session_user_id !== input.userId
+  ) {
+    return {
+      allowed: false,
+      reason: "identity_mismatch",
+    };
+  }
 
   if (row.session_status !== "active") {
     return {
@@ -119,9 +133,9 @@ export async function checkDeviceSession(
 
   return {
     allowed: true,
-    tenantId: row.tenant_id,
-    deviceId: row.device_id,
-    userId: row.user_id,
+    tenantId: row.session_tenant_id,
+    deviceId: row.session_device_id,
+    userId: row.session_user_id,
     sessionId: row.id,
   };
 }

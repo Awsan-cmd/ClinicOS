@@ -22,9 +22,9 @@ describe("ClinicOS Phase 1I device session enforcement", () => {
 
     expect(source).toContain("export async function checkDeviceSession");
     expect(source).toContain("WHERE ds.id = $1");
-    expect(source).toContain("AND ds.tenant_id = $2");
-    expect(source).toContain("AND ds.device_id = $3");
-    expect(source).toContain("AND ds.user_id = $4");
+    expect(source).toContain("ds.tenant_id AS session_tenant_id");
+    expect(source).toContain("ds.device_id AS session_device_id");
+    expect(source).toContain("ds.user_id AS session_user_id");
   });
 
   it("enforces tenant isolation", () => {
@@ -34,7 +34,8 @@ describe("ClinicOS Phase 1I device session enforcement", () => {
     );
 
     expect(source).toContain("tenant_mismatch");
-    expect(source).toContain("AND ds.tenant_id = $2");
+    expect(source).toContain("ds.tenant_id AS session_tenant_id");
+    expect(source).toContain("row.session_tenant_id !== input.tenantId");
   });
 
   it("enforces device and user identity", () => {
@@ -44,8 +45,10 @@ describe("ClinicOS Phase 1I device session enforcement", () => {
     );
 
     expect(source).toContain("identity_mismatch");
-    expect(source).toContain("AND ds.device_id = $3");
-    expect(source).toContain("AND ds.user_id = $4");
+    expect(source).toContain("ds.device_id AS session_device_id");
+    expect(source).toContain("ds.user_id AS session_user_id");
+    expect(source).toContain("row.session_device_id !== input.deviceId");
+    expect(source).toContain("row.session_user_id !== input.userId");
   });
 
   it("rejects revoked and expired sessions", () => {
@@ -93,6 +96,42 @@ describe("ClinicOS Phase 1I device session enforcement", () => {
     expect(source).toContain("da.user_id = ds.user_id");
   });
 
+
+
+  it("distinguishes tenant mismatch from missing session", () => {
+    const source = readFileSync(
+      "packages/db/src/device-session-guard.ts",
+      "utf8",
+    );
+
+    expect(source).toContain('reason: "tenant_mismatch"');
+    expect(source).toContain("session_tenant_id");
+    expect(source).toContain("input.tenantId");
+  });
+
+  it("distinguishes identity mismatch from missing session", () => {
+    const source = readFileSync(
+      "packages/db/src/device-session-guard.ts",
+      "utf8",
+    );
+
+    expect(source).toContain('reason: "identity_mismatch"');
+    expect(source).toContain("session_device_id");
+    expect(source).toContain("session_user_id");
+    expect(source).toContain("input.deviceId");
+    expect(source).toContain("input.userId");
+  });
+
+  it("keeps missing sessions distinguishable from existing sessions", () => {
+    const source = readFileSync(
+      "packages/db/src/device-session-guard.ts",
+      "utf8",
+    );
+
+    expect(source).toContain('reason: "session_not_found"');
+    expect(source).toContain("result.rowCount !== 1");
+  });
+
   it("returns a positive authorization result only after all checks", () => {
     const source = readFileSync(
       "packages/db/src/device-session-guard.ts",
@@ -100,9 +139,9 @@ describe("ClinicOS Phase 1I device session enforcement", () => {
     );
 
     expect(source).toContain("allowed: true");
-    expect(source).toContain("tenantId: row.tenant_id");
-    expect(source).toContain("deviceId: row.device_id");
-    expect(source).toContain("userId: row.user_id");
+    expect(source).toContain("tenantId: row.session_tenant_id");
+    expect(source).toContain("deviceId: row.session_device_id");
+    expect(source).toContain("userId: row.session_user_id");
     expect(source).toContain("sessionId: row.id");
   });
 });
