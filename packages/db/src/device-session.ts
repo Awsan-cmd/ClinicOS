@@ -11,8 +11,8 @@ export interface CreateDeviceSessionRecord {
 export async function createDeviceSession(
   pool: Pool,
   session: CreateDeviceSessionRecord,
-): Promise<void> {
-  await pool.query(
+): Promise<boolean> {
+  const result = await pool.query(
     `
       INSERT INTO device_sessions (
         id,
@@ -42,6 +42,8 @@ export async function createDeviceSession(
           AND tenant_id = $2
           AND status = 'active'
       )
+      AND $5 > NOW()
+      RETURNING id
     `,
     [
       session.id,
@@ -51,6 +53,8 @@ export async function createDeviceSession(
       session.expiresAt,
     ],
   );
+
+  return result.rowCount === 1;
 }
 
 export async function revokeDeviceSession(

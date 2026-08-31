@@ -667,3 +667,25 @@ Validation:
 - Git diff check passed
 
 The implementation is ready for staging and commit.
+---
+
+## 2026-08-31 — Phase 1L Device Session Creation Hardening
+
+Hardened device-session creation.
+
+Added:
+
+- database-level rejection of already-expired session creation
+- `RETURNING id` to detect actual insertion
+- boolean creation result for callers
+- regression tests for expired-session rejection
+- regression tests for creation outcome reporting
+
+Validation:
+
+- typecheck passed
+- lint passed
+- 76 tests passed
+- Git diff check passed
+
+The implementation is ready for staging and commit.

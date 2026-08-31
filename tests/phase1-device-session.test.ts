@@ -205,6 +205,78 @@ describe("ClinicOS Phase 1H device session foundation", () => {
     expect(sessionSource).toContain("expires_at > NOW()");
   });
 
+
+
+  it("rejects session creation when expiresAt is already in the past", () => {
+    const source = readFileSync(
+      "packages/db/src/device-session.ts",
+      "utf8",
+    );
+
+    const start = source.indexOf(
+      "export async function createDeviceSession",
+    );
+    const end = source.indexOf(
+      "export async function revokeDeviceSession",
+    );
+
+    expect(start).toBeGreaterThanOrEqual(0);
+    expect(end).toBeGreaterThan(start);
+
+    const createSource = source.slice(start, end);
+
+    expect(createSource).toContain("expires_at");
+    expect(createSource).toContain("NOW()");
+  });
+
+  it("returns whether device session creation actually inserted a row", () => {
+    const source = readFileSync(
+      "packages/db/src/device-session.ts",
+      "utf8",
+    );
+
+    const start = source.indexOf(
+      "export async function createDeviceSession",
+    );
+    const end = source.indexOf(
+      "export async function revokeDeviceSession",
+    );
+
+    expect(start).toBeGreaterThanOrEqual(0);
+    expect(end).toBeGreaterThan(start);
+
+    const createSource = source.slice(start, end);
+
+    expect(createSource).toContain("RETURNING");
+    expect(createSource).not.toContain("Promise<void>");
+  });
+
+  it("keeps session creation scoped to active authorization", () => {
+    const source = readFileSync(
+      "packages/db/src/device-session.ts",
+      "utf8",
+    );
+
+    const start = source.indexOf(
+      "export async function createDeviceSession",
+    );
+    const end = source.indexOf(
+      "export async function revokeDeviceSession",
+    );
+
+    expect(start).toBeGreaterThanOrEqual(0);
+    expect(end).toBeGreaterThan(start);
+
+    const createSource = source.slice(start, end);
+
+    expect(createSource).toContain("FROM device_access");
+    expect(createSource).toContain("FROM devices");
+    expect(createSource).toContain("tenant_id = $2");
+    expect(createSource).toContain("device_id = $3");
+    expect(createSource).toContain("user_id = $4");
+    expect(createSource).toContain("status = 'active'");
+  });
+
   it("does not expose a general-purpose session update helper", () => {
     const source = readFileSync(
       "packages/db/src/device-session.ts",

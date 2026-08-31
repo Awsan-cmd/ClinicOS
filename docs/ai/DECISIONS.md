@@ -451,3 +451,22 @@ Session lifecycle operations require matching tenant, device, and user identity.
 Reason:
 
 Session identifiers alone must never permit cross-tenant or cross-identity session manipulation.
+---
+
+## Decision 043 — Device Sessions Must Have a Future Expiry
+
+Device-session creation rejects an expiration timestamp that is not strictly later than the current database time.
+
+Reason:
+
+A session must never be created already expired. Enforcing this at the database query boundary prevents callers from accidentally persisting unusable sessions.
+
+---
+
+## Decision 044 — Session Creation Reports Persistence Outcome
+
+Device-session creation returns whether a row was actually inserted.
+
+Reason:
+
+Authorization conditions may prevent insertion. Callers must be able to distinguish successful session creation from a rejected creation without assuming that the INSERT always produced a row.

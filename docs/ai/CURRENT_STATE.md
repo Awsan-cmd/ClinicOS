@@ -26,6 +26,13 @@ Phase 1 — Platform / Identity and Security Foundation.
 - Phase 1I device session enforcement foundation implemented and validated.
 - Phase 1J device-session revocation propagation implemented and validated.
 - Phase 1K device-session lifecycle hardening implemented and validated.
+- Phase 1L device-session creation hardening implemented and validated.
+- Session creation now rejects already-expired sessions at the database boundary.
+- Session creation now reports whether a session row was actually inserted.
+- Session creation remains scoped to active tenant/device/user authorization.
+- Full validation passes with 76 tests.
+- Current implementation recovery point is pending commit.
+
 - Session touch requires matching tenant, device, and user identity.
 - Session touch requires active, non-expired session state.
 - Session touch requires current active device access.
