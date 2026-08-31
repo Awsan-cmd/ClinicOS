@@ -470,3 +470,9 @@ Device-session creation returns whether a row was actually inserted.
 Reason:
 
 Authorization conditions may prevent insertion. Callers must be able to distinguish successful session creation from a rejected creation without assuming that the INSERT always produced a row.
+
+## Device Session Authorization Boundary
+
+Device-session authorization must not trust tenant, device, or user identifiers supplied alongside a session identifier. The session is resolved first by its own identity, then its persisted tenant/device/user binding is compared explicitly with the request context. Current device state and current device-access state are also revalidated before authorization succeeds.
+
+A reusable `requireDeviceSession` helper converts denied authorization results into a typed `DeviceSessionAuthorizationError`, allowing application boundaries to enforce the same security policy consistently.

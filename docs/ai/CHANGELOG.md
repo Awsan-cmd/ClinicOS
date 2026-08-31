@@ -1,3 +1,16 @@
+
+## 2026-08-31 — Device Session Enforcement Hardening
+
+- Hardened device-session tenant and identity validation.
+- Session lookup is performed by session identity, followed by explicit tenant/device/user validation.
+- Added typed `DeviceSessionAuthorizationError` enforcement.
+- Added `requireDeviceSession` for reusable authorization enforcement.
+- Added a success-only required-session response contract.
+- Verified full test suite: 82 tests passed across 13 test files.
+- Verified TypeScript typecheck and ESLint.
+- Verified `git diff --check`.
+- Latest repository recovery point: `53ab23f`.
+
 # ClinicOS Development Changelog
 
 This file records the historical and ongoing implementation progress of ClinicOS.
