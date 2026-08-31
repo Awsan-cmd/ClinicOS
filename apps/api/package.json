@@ -5,6 +5,13 @@
   "type": "module",
   "dependencies": {
     "@clinicos/config": "0.1.0",
-    "@clinicos/contracts": "0.1.0"
+    "@clinicos/contracts": "0.1.0",
+    "@clinicos/db": "0.1.0"
+  },
+  "scripts": {
+    "dev": "tsx src/server.ts",
+    "start": "tsx src/server.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint ."
   }
 }
