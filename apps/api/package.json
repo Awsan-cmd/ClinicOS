@@ -1,5 +1,10 @@
 {
   "name": "@clinicos/api",
   "version": "0.1.0",
-  "private": true
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@clinicos/config": "0.1.0",
+    "@clinicos/contracts": "0.1.0"
+  }
 }

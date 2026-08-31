@@ -1,5 +1,9 @@
 {
   "name": "@clinicos/config",
   "version": "0.1.0",
-  "private": true
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./env": "./src/env.ts"
+  }
 }

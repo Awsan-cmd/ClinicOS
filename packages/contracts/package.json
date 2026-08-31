@@ -1,5 +1,12 @@
 {
   "name": "@clinicos/contracts",
   "version": "0.1.0",
-  "private": true
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@clinicos/types": "0.1.0"
+  },
+  "exports": {
+    "./tenant": "./src/tenant.ts"
+  }
 }
