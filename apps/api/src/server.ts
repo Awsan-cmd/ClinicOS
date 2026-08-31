@@ -1,9 +1,13 @@
+import { createDbPool } from "@clinicos/db/client";
 import { createApiServer } from "./app.js";
 
-const port = Number(process.env.PORT ?? 3000);
+const port = Number(
+  process.env.API_PORT ?? process.env.PORT ?? 3000,
+);
 const host = process.env.HOST ?? "0.0.0.0";
 
-const server = createApiServer();
+const pool = createDbPool();
+const server = createApiServer(pool);
 
 server.listen(port, host, () => {
   console.log(
@@ -16,7 +20,7 @@ server.listen(port, host, () => {
   );
 });
 
-function shutdown(signal: string): void {
+async function shutdown(signal: string): Promise<void> {
   console.log(
     JSON.stringify({
       event: "api_shutdown",
@@ -24,16 +28,29 @@ function shutdown(signal: string): void {
     }),
   );
 
-  server.close((error) => {
+  server.close(async (error) => {
     if (error) {
       console.error(error);
       process.exitCode = 1;
-      return;
     }
 
-    process.exit(0);
+    try {
+      await pool.end();
+    } catch (poolError) {
+      console.error(poolError);
+      process.exitCode = 1;
+    }
+
+    if (!error && process.exitCode !== 1) {
+      process.exit(0);
+    }
   });
 }
 
-process.on("SIGINT", () => shutdown("SIGINT"));
-process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT", () => {
+  void shutdown("SIGINT");
+});
+
+process.on("SIGTERM", () => {
+  void shutdown("SIGTERM");
+});

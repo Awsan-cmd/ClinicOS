@@ -3,15 +3,20 @@ import {
   type IncomingMessage,
   type ServerResponse,
 } from "node:http";
+import { createDbPool } from "@clinicos/db/client";
+import type { Pool } from "pg";
+import { authenticateRequest } from "./auth.js";
 import { createRequestContext } from "./context.js";
 import { ApiError, toApiError } from "./errors.js";
 import { sendError } from "./http.js";
 import { handleHealth } from "./routes/health.js";
+import { handleMe } from "./routes/me.js";
 
-function route(
+async function route(
   request: IncomingMessage,
   response: ServerResponse,
-): void {
+  pool: Pool,
+): Promise<void> {
   const context = createRequestContext(request.headers);
   const method = request.method ?? "GET";
   const url = new URL(
@@ -33,6 +38,23 @@ function route(
     return;
   }
 
+  if (
+    method === "GET" &&
+    url.pathname === "/api/v1/me"
+  ) {
+    const authenticatedUser = await authenticateRequest(
+      pool,
+      request.headers,
+    );
+
+    if (authenticatedUser) {
+      context.authenticatedUser = authenticatedUser;
+    }
+
+    handleMe(request, response, context);
+    return;
+  }
+
   throw new ApiError(
     404,
     "not_found",
@@ -40,12 +62,12 @@ function route(
   );
 }
 
-export function createApiServer() {
-  return createServer((request, response) => {
+export function createApiServer(pool: Pool = createDbPool()) {
+  return createServer(async (request, response) => {
     const context = createRequestContext(request.headers);
 
     try {
-      route(request, response);
+      await route(request, response, pool);
     } catch (error) {
       const apiError = toApiError(error);
 

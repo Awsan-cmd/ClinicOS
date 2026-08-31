@@ -1,11 +1,13 @@
 import { randomUUID } from "node:crypto";
 import type { IncomingHttpHeaders } from "node:http";
+import type { AuthenticatedUser } from "@clinicos/contracts/auth";
 import type { TenantContext } from "@clinicos/contracts/tenant";
 
 export interface RequestContext {
   requestId: string;
   correlationId: string;
   tenantContext?: TenantContext;
+  authenticatedUser?: AuthenticatedUser;
 }
 
 function headerValue(

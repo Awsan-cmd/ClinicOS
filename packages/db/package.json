@@ -14,7 +14,9 @@
     "./devices": "./src/devices.ts",
     "./device-access": "./src/device-access.ts",
     "./device-session": "./src/device-session.ts",
-    "./device-session-guard": "./src/device-session-guard.ts"
+    "./device-session-guard": "./src/device-session-guard.ts",
+    "./identity": "./src/identity.ts",
+    "./session-auth": "./src/session-auth.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
