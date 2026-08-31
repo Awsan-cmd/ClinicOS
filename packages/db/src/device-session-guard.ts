@@ -70,12 +70,7 @@ export async function checkDeviceSession(
       WHERE ds.id = $1
       LIMIT 1
     `,
-    [
-      input.sessionId,
-      input.tenantId,
-      input.deviceId,
-      input.userId,
-    ],
+    [input.sessionId],
   );
 
   if (result.rowCount !== 1) {
