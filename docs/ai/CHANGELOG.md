@@ -607,3 +607,38 @@ Validation:
 - Git diff check passed
 
 The task is ready for staging and commit.
+---
+
+## 2026-08-31 — Phase 1J Device Session Revocation Propagation
+
+Added immediate session invalidation when device authorization is revoked.
+
+Added:
+
+- device-access revocation propagation to active sessions
+- device revocation propagation to active sessions
+- tenant-scoped device-access revocation
+- tenant-scoped device revocation
+- exact tenant/device/user matching for access revocation
+- exact tenant/device matching for device revocation
+- Phase 1J propagation and tenant-isolation tests
+
+Security properties:
+
+- revoking device access immediately revokes matching active sessions
+- revoking a device immediately revokes matching active sessions
+- cross-tenant device-access revocation is prevented
+- cross-tenant device revocation is prevented
+- unrelated users' sessions are not revoked by access revocation
+- unrelated devices' sessions are not revoked by device revocation
+- already-revoked sessions are not unnecessarily modified
+- propagated sessions receive an explicit `revoked_at` timestamp
+
+Validation:
+
+- typecheck passed
+- lint passed
+- 66 tests passed
+- Git diff check passed
+
+The task is ready for staging and commit.

@@ -24,6 +24,15 @@ Phase 1 — Platform / Identity and Security Foundation.
 - Phase 1G device access foundation implemented and validated.
 - Phase 1H device session foundation implemented and validated.
 - Phase 1I device session enforcement foundation implemented and validated.
+- Phase 1J device-session revocation propagation implemented and validated.
+- Revoking device access immediately revokes matching active device sessions.
+- Revoking a device immediately revokes matching active device sessions.
+- Device-access revocation is tenant-scoped.
+- Device revocation is tenant-scoped.
+- Session propagation remains bound to the exact tenant, device, and user relationship.
+- Existing revoked sessions are not rewritten unnecessarily.
+- Current implementation recovery point is pending commit.
+
 - Device session checks enforce tenant, device, and user identity.
 - Revoked and expired sessions are denied.
 - Revoked devices are denied.

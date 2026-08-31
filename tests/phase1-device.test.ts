@@ -57,6 +57,10 @@ describe("ClinicOS Phase 1F device foundation", () => {
     expect(migration).toContain("revoked_at TIMESTAMPTZ");
     expect(source).toContain("export async function revokeDevice");
     expect(source).toContain("status = 'revoked'");
+    expect(source).toContain("AND tenant_id = $2");
+    expect(source).toContain("UPDATE device_sessions AS ds");
+    expect(source).toContain("ds.tenant_id = rd.tenant_id");
+    expect(source).toContain("ds.device_id = rd.id");
   });
 
   it("supports device heartbeat state", () => {

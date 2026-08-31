@@ -35,17 +35,33 @@ export async function grantDeviceAccess(
 
 export async function revokeDeviceAccess(
   pool: Pool,
-  accessId: string,
+  input: {
+    accessId: string;
+    tenantId: string;
+  },
 ): Promise<void> {
   await pool.query(
     `
-      UPDATE device_access
+      WITH revoked_access AS (
+        UPDATE device_access
+        SET
+          status = 'revoked',
+          revoked_at = NOW()
+        WHERE id = $1
+          AND tenant_id = $2
+        RETURNING tenant_id, device_id, user_id
+      )
+      UPDATE device_sessions AS ds
       SET
         status = 'revoked',
         revoked_at = NOW()
-      WHERE id = $1
+      FROM revoked_access AS ra
+      WHERE ds.tenant_id = ra.tenant_id
+        AND ds.device_id = ra.device_id
+        AND ds.user_id = ra.user_id
+        AND ds.status = 'active'
     `,
-    [accessId],
+    [input.accessId, input.tenantId],
   );
 }
 

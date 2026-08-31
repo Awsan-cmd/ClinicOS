@@ -393,3 +393,42 @@ Session authorization checks compare `expires_at` against the current time and d
 Reason:
 
 Expiration must be enforced at the authorization boundary even if an explicit lifecycle transition has not yet marked the record as expired.
+---
+
+## Decision 037 — Authorization Revocation Propagates Immediately
+
+Revoking device access immediately revokes all currently active sessions for the exact tenant, device, and user relationship.
+
+Reason:
+
+Removing authorization must invalidate authentication state without waiting for a later session check.
+
+---
+
+## Decision 038 — Device Revocation Propagates to Active Sessions
+
+Revoking a device immediately revokes all currently active sessions associated with that device within the same tenant.
+
+Reason:
+
+A revoked device must not retain usable authentication sessions.
+
+---
+
+## Decision 039 — Revocation Mutations Are Tenant-Scoped
+
+Device and device-access revocation require both the resource identity and tenant identity.
+
+Reason:
+
+Lifecycle mutations must preserve tenant isolation and prevent cross-tenant authorization changes.
+
+---
+
+## Decision 040 — Revocation Propagation Targets Active Sessions Only
+
+Propagation updates only sessions whose status is currently `active`.
+
+Reason:
+
+Historical revoked sessions should remain historical records and should not receive unnecessary lifecycle mutations.

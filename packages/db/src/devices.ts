@@ -41,18 +41,33 @@ export async function createDevice(
 
 export async function revokeDevice(
   pool: Pool,
-  deviceId: string,
+  input: {
+    deviceId: string;
+    tenantId: string;
+  },
 ): Promise<void> {
   await pool.query(
     `
-      UPDATE devices
+      WITH revoked_device AS (
+        UPDATE devices
+        SET
+          status = 'revoked',
+          revoked_at = NOW(),
+          updated_at = NOW()
+        WHERE id = $1
+          AND tenant_id = $2
+        RETURNING tenant_id, id
+      )
+      UPDATE device_sessions AS ds
       SET
         status = 'revoked',
-        revoked_at = NOW(),
-        updated_at = NOW()
-      WHERE id = $1
+        revoked_at = NOW()
+      FROM revoked_device AS rd
+      WHERE ds.tenant_id = rd.tenant_id
+        AND ds.device_id = rd.id
+        AND ds.status = 'active'
     `,
-    [deviceId],
+    [input.deviceId, input.tenantId],
   );
 }
 

@@ -48,6 +48,11 @@ describe("ClinicOS Phase 1G device access foundation", () => {
     );
     expect(source).toContain("status = 'revoked'");
     expect(source).toContain("revoked_at = NOW()");
+    expect(source).toContain("AND tenant_id = $2");
+    expect(source).toContain("UPDATE device_sessions AS ds");
+    expect(source).toContain("ds.tenant_id = ra.tenant_id");
+    expect(source).toContain("ds.device_id = ra.device_id");
+    expect(source).toContain("ds.user_id = ra.user_id");
   });
 
   it("checks only active access", () => {
