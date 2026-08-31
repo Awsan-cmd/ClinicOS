@@ -7,6 +7,7 @@
     "@clinicos/types": "0.1.0"
   },
   "exports": {
-    "./tenant": "./src/tenant.ts"
+    "./tenant": "./src/tenant.ts",
+    "./auth": "./src/auth.ts"
   }
 }

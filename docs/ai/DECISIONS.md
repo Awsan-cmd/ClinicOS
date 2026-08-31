@@ -134,3 +134,39 @@ The repository explicitly installs `@types/node` and `@types/pg`.
 Reason:
 
 The database and configuration packages use Node.js APIs and PostgreSQL types and therefore require explicit compile-time definitions under the project's strict TypeScript configuration.
+---
+
+## Decision 011 — Identity Bound to Tenant Context
+
+Authenticated users carry both `UserIdentity` and `TenantContext`.
+
+Reason:
+
+Authentication must not establish identity independently from tenant and branch authorization context.
+
+---
+
+## Decision 012 — Explicit Application Roles
+
+ClinicOS defines explicit application roles:
+
+- owner
+- admin
+- manager
+- doctor
+- receptionist
+- nurse
+
+Reason:
+
+Roles form the initial authorization vocabulary and provide a stable foundation for later permission policies.
+
+---
+
+## Decision 013 — ESM Explicit Relative Import Extensions
+
+Relative TypeScript imports use `.js` extensions where required by the NodeNext/Node16 module-resolution model.
+
+Reason:
+
+The repository uses ESM-compatible TypeScript configuration, where runtime-relative imports must resolve with explicit extensions.

@@ -16,6 +16,13 @@ Phase 1 — Platform / Identity and Security Foundation.
 - Phase 1 tenancy foundation completed and pushed.
 - Continuous documentation and recovery-point policy established.
 - Phase 1A database foundation completed and validated.
+- Phase 1B identity foundation implemented and validated.
+- User identity and application role types added.
+- Authentication request/response contracts added.
+- Authenticated users are explicitly bound to `TenantContext`.
+- ESM relative imports use explicit `.js` specifiers for NodeNext compatibility.
+- Current implementation recovery point is pending commit.
+
 - PostgreSQL client pool and transactional migration runner added.
 - `schema_migrations` tracking prevents already-applied migrations from being re-executed.
 - Node.js and PostgreSQL TypeScript definitions added for workspace type safety.
