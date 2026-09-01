@@ -176,10 +176,10 @@ Documentation is updated as part of the implementation workflow before significa
 
 - Verified: 2026-09-01
 - Branch: `main`
-- HEAD: `06b528e`
-- `origin/main`: `06b528e`
+- HEAD: `66fe637`
+- `origin/main`: `66fe637`
 - Working tree: clean
-- Latest commit: `feat(api): add patient creation with tenant-scoped authorization`
+- Latest commit: `docs(ai): record patient creation API`
 - Patient database migration: `database/migrations/0008_patients.sql`
 - Patient DB access: `packages/db/src/patients.ts`
 - DB package export: `@clinicos/db/patients`
