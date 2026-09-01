@@ -176,21 +176,28 @@ Documentation is updated as part of the implementation workflow before significa
 
 - Verified: 2026-09-01
 - Branch: `main`
-- HEAD: `f96e1e821fe233e29467d847afd246bb87ad0059`
-- `origin/main`: `f96e1e821fe233e29467d847afd246bb87ad0059`
+- HEAD: `06b528e`
+- `origin/main`: `06b528e`
 - Working tree: clean
-- Latest commit: `feat(api): add tenant-scoped patient listing`
+- Latest commit: `feat(api): add patient creation with tenant-scoped authorization`
 - Patient database migration: `database/migrations/0008_patients.sql`
 - Patient DB access: `packages/db/src/patients.ts`
 - DB package export: `@clinicos/db/patients`
-- API route: `GET /api/v1/patients`
-- Authorization: requires `patient:read`
+- API routes:
+  - `GET /api/v1/patients`
+  - `POST /api/v1/patients`
+- Patient listing authorization: requires `patient:read`
+- Patient creation authorization: requires `patient:manage`
 - Tenant scoping: uses authenticated user's `tenantId`
 - Branch scoping: uses authenticated user's `branchId` when present
-- Integration coverage: patient listing route test added
+- Patient creation persists tenant, optional branch, creator identity, demographic/contact fields, and audit event
+- Patient medical record number uniqueness: database constraint `UNIQUE (tenant_id, medical_record_number)`
+- Duplicate medical record numbers return API `409 conflict`
+- Patient creation and audit event are committed transactionally
+- Integration coverage: patient authorization and creation route tests
 - Validation: `git diff --check` passed
 - Validation: workspace TypeScript typecheck passed
 - Validation: workspace ESLint passed
-- Validation: Vitest passed — 17 test files, 92 tests passed
-- Previous patient-access placeholder route was replaced by the real patient listing route
+- Validation: Vitest passed — 17 test files, 98 tests passed
+- Previous patient-access placeholder route was replaced by the real tenant/branch-scoped patient listing and creation routes
 - Current architecture remains the Phase 1 authenticated, tenant-aware API foundation

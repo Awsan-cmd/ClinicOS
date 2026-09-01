@@ -777,3 +777,39 @@ Validation:
 - `git diff --check` passed.
 - Working tree clean after commit.
 - Local `HEAD` matched `origin/main`.
+
+
+---
+
+## 2026-09-01 — Patient Creation API
+
+Commit: `06b528e`
+
+Implemented authenticated patient creation with tenant-scoped authorization.
+
+Added:
+
+- `POST /api/v1/patients`
+- `patient:manage` authorization boundary
+- Tenant scoping from authenticated request context
+- Optional branch scoping from authenticated request context
+- Patient input validation
+- ISO `YYYY-MM-DD` date-of-birth validation
+- Tenant-scoped medical record number uniqueness handling
+- `409 conflict` response for duplicate medical record numbers
+- Transactional patient creation
+- `patient.created` audit event
+- Integration tests covering authorization and patient creation
+
+Database constraint verified:
+
+- `UNIQUE (tenant_id, medical_record_number)` in `database/migrations/0008_patients.sql`
+
+Validation:
+
+- typecheck passed
+- lint passed
+- 98 tests passed
+- Git diff check passed
+
+Commit pushed to `origin/main`.
