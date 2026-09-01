@@ -47,7 +47,7 @@ async function startServer(pool: object) {
 
   return {
     server,
-    url: `http://127.0.0.1:${address.port}/api/v1/patient-access`,
+    url: `http://127.0.0.1:${address.port}/api/v1/patients`,
   };
 }
 
@@ -81,25 +81,78 @@ describe("ClinicOS protected API route", () => {
     }
   });
 
-  it("authenticates and authorizes a doctor with patient:read", async () => {
+
+  it("reads patients using the authenticated tenant and branch context", async () => {
     const pool = createPool();
+
+    pool.query.mockResolvedValueOnce({
+      rowCount: 2,
+      rows: [
+        {
+          id: "patient-1",
+          tenant_id: "tenant-1",
+          branch_id: "branch-1",
+          medical_record_number: "MRN-001",
+          first_name: "Ali",
+          last_name: "Hassan",
+          date_of_birth: "1990-01-01",
+          phone: "555-0001",
+          created_at: "2026-09-01T10:00:00.000Z",
+        },
+        {
+          id: "patient-2",
+          tenant_id: "tenant-1",
+          branch_id: "branch-1",
+          medical_record_number: "MRN-002",
+          first_name: "Sara",
+          last_name: "Ahmed",
+          date_of_birth: null,
+          phone: null,
+          created_at: "2026-09-01T09:00:00.000Z",
+        },
+      ],
+    });
+
     const { server, url } = await startServer(pool);
 
+    const patientsUrl = url.replace(
+      "/api/v1/patients",
+      "/api/v1/patients",
+    );
+
     try {
-      const response = await fetch(url, {
+      const response = await fetch(patientsUrl, {
         headers: {
           authorization: "Bearer test-session-token",
         },
       });
 
       expect(response.status).toBe(200);
+
       await expect(response.json()).resolves.toMatchObject({
         data: {
-          authorized: true,
-          permission: "patient:read",
+          patients: [
+            {
+              id: "patient-1",
+              tenantId: "tenant-1",
+              branchId: "branch-1",
+              medicalRecordNumber: "MRN-001",
+            },
+            {
+              id: "patient-2",
+              tenantId: "tenant-1",
+              branchId: "branch-1",
+              medicalRecordNumber: "MRN-002",
+            },
+          ],
         },
       });
-      expect(pool.query).toHaveBeenCalledTimes(2);
+
+      expect(pool.query).toHaveBeenNthCalledWith(
+        3,
+        expect.stringContaining("WHERE tenant_id = $1"),
+        ["tenant-1", "branch-1"],
+      );
     } finally {
       await new Promise<void>((resolve, reject) => {
         server.close((error) => {
@@ -109,4 +162,5 @@ describe("ClinicOS protected API route", () => {
       });
     }
   });
+
 });
