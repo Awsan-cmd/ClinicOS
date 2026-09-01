@@ -11,6 +11,7 @@ import { ApiError, toApiError } from "./errors.js";
 import { sendError } from "./http.js";
 import { handleHealth } from "./routes/health.js";
 import { handleMe } from "./routes/me.js";
+import { handlePatientAccess } from "./routes/patient-access.js";
 
 async function route(
   request: IncomingMessage,
@@ -35,6 +36,23 @@ async function route(
     url.pathname === "/api/v1/health"
   ) {
     handleHealth(request, response, context);
+    return;
+  }
+
+  if (
+    method === "GET" &&
+    url.pathname === "/api/v1/patient-access"
+  ) {
+    const authenticatedUser = await authenticateRequest(
+      pool,
+      request.headers,
+    );
+
+    if (authenticatedUser) {
+      context.authenticatedUser = authenticatedUser;
+    }
+
+    handlePatientAccess(request, response, context);
     return;
   }
 
