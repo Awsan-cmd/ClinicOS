@@ -702,3 +702,50 @@ Validation:
 - Git diff check passed
 
 The implementation is ready for staging and commit.
+
+
+---
+
+## 2026-09-01 — API Session Authentication and Me Endpoint
+
+Commit: `af166c9`
+
+Implemented the first API authentication boundary.
+
+Added:
+
+- Bearer session-token extraction.
+- SHA-256 session-token hashing.
+- Active session lookup.
+- Tenant-bound user identity lookup.
+- Authenticated request context.
+- `GET /api/v1/me`.
+- API authentication tests.
+- API database pool integration.
+- Graceful API database-pool shutdown.
+
+Validation recorded:
+
+- TypeScript typecheck passed.
+- ESLint passed.
+- Vitest: 15 test files passed.
+- Vitest: 86 tests passed.
+- `git diff --check` passed.
+
+---
+
+## 2026-09-01 — Linux Terminal Development Workflow
+
+Commit: `c2f9ee1`
+
+Replaced the old Termux-oriented development-environment documentation with the canonical Linux Terminal workflow.
+
+The development workstation is Linux + standard Terminal + Bash-compatible shell.
+
+Android remains a future ClinicOS client/platform target and is not the development environment.
+
+Validation:
+
+- Working tree clean.
+- Local `HEAD` matched `origin/main`.
+- Commit pushed to GitHub.

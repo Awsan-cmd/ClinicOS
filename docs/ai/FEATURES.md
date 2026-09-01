@@ -18,17 +18,19 @@
   - Verified typecheck, lint, and test execution.
 
 ## IN PROGRESS
-Repository foundation:
-- Local infrastructure.
-- Docker Compose.
-- PostgreSQL.
-- Redis.
-- Environment configuration.
-- Health checks.
-- CI foundation.
+Phase 1 — Platform / Identity and Security Foundation:
+- API authentication boundary hardening.
+- Authentication lifecycle completion.
+- Authorization enforcement at API boundaries.
+- Session/logout lifecycle integration.
+- Security regression coverage.
+
+Repository/Infrastructure foundation is implemented and validated.
 
 ## PLANNED
-Multi-tenancy, auth/RBAC, clinic/branches, patients, scheduling, clinical, dental, billing, CRM, inbox, notifications, automation, AI agents, voice, portal, analytics, SaaS billing, production infrastructure.
+Clinic/branches, patients, scheduling, clinical, dental, billing, CRM, inbox, notifications, automation, AI agents, voice, portal, analytics, SaaS billing, production infrastructure.
+
+Authentication, sessions, RBAC, audit, device identity, device access, device sessions, and API `/me` identity are no longer merely planned; their implemented foundations are recorded under COMPLETED.
 
 ## BLOCKED
 None.
@@ -59,3 +61,25 @@ Planned from the beginning:
 Implementation is deferred to the Channels/Voice phases.
 
 A feature becomes COMPLETED only after implementation, testing, review, and verification.
+
+
+### Phase 1 — Platform / Identity and Security Foundation
+
+The following foundations are implemented and validated:
+
+- Tenancy and tenant context.
+- User identity and roles.
+- Sessions with expiration and revocation.
+- Centralized RBAC permissions.
+- Tenant-bound audit events.
+- Device identity and capabilities.
+- Device access relationships.
+- Device sessions.
+- Device-session authorization guard.
+- Device/session revocation propagation.
+- Device-session lifecycle hardening.
+- Device-session creation hardening.
+- API session authentication.
+- Authenticated `GET /api/v1/me` endpoint.
+
+Remaining Phase 1 work must harden and complete authentication/authorization lifecycle behavior before moving to major clinic-domain features.

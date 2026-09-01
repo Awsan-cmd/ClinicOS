@@ -6,7 +6,8 @@ Phase 1 — Platform / Identity and Security Foundation.
 
 ## Verified Recovery Point
 
-- Latest verified commit: `53ab23f` — `fix: align device session guard query parameters`.
+- Latest verified functional commit: `af166c9` — `feat(api): add session authentication and me endpoint`.
+- Latest repository documentation commit: `c2f9ee1` — `docs(ai): define Linux terminal development workflow`.
 - Phase 1 device-session enforcement and revocation foundations are implemented.
 - Required device-session enforcement helper is implemented.
 - Full test suite currently validates the Phase 1 platform foundation.
@@ -132,3 +133,25 @@ Development is documented continuously.
 - `docs/ai/CHANGELOG.md` — chronological implementation and validation history.
 
 Documentation is updated as part of the implementation workflow before significant commits.
+
+
+## API Authentication Foundation
+
+- Session-token authentication is implemented at the API boundary.
+- Bearer tokens are extracted from the `Authorization` header.
+- Session tokens are hashed with SHA-256 before database lookup.
+- Active sessions are resolved through the dedicated database session-auth helper.
+- User identity is resolved within the session tenant context.
+- Authenticated requests receive explicit `AuthenticatedUser` and `TenantContext`.
+- `GET /api/v1/me` returns the authenticated user and tenant/branch context.
+- Missing authentication returns HTTP 401.
+- Valid session authentication returns HTTP 200.
+- API authentication tests are present and passing.
+- Authentication implementation commit: `af166c9`.
+
+## Current Recovery Point
+
+- `main` is synchronized with `origin/main`.
+- Latest commit: `c2f9ee1`.
+- Working tree was clean after the Linux workflow documentation commit.
+- The previous `53ab23f` recovery point is historical, not current.
