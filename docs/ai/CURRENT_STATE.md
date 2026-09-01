@@ -171,3 +171,26 @@ Documentation is updated as part of the implementation workflow before significa
   - Vitest: 15 test files passed.
   - Vitest: 86 tests passed.
   - `git diff --check` passed.
+
+## Latest Verified Repository Snapshot
+
+- Verified: 2026-09-01
+- Branch: `main`
+- HEAD: `f96e1e821fe233e29467d847afd246bb87ad0059`
+- `origin/main`: `f96e1e821fe233e29467d847afd246bb87ad0059`
+- Working tree: clean
+- Latest commit: `feat(api): add tenant-scoped patient listing`
+- Patient database migration: `database/migrations/0008_patients.sql`
+- Patient DB access: `packages/db/src/patients.ts`
+- DB package export: `@clinicos/db/patients`
+- API route: `GET /api/v1/patients`
+- Authorization: requires `patient:read`
+- Tenant scoping: uses authenticated user's `tenantId`
+- Branch scoping: uses authenticated user's `branchId` when present
+- Integration coverage: patient listing route test added
+- Validation: `git diff --check` passed
+- Validation: workspace TypeScript typecheck passed
+- Validation: workspace ESLint passed
+- Validation: Vitest passed — 17 test files, 92 tests passed
+- Previous patient-access placeholder route was replaced by the real patient listing route
+- Current architecture remains the Phase 1 authenticated, tenant-aware API foundation
