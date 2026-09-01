@@ -7,6 +7,7 @@ import type { UserIdentity } from "@clinicos/types/identity";
 import type { BranchId, TenantId, UserId } from "@clinicos/types/tenant";
 import { findUserIdentity } from "@clinicos/db/identity";
 import { findActiveSessionByTokenHash } from "@clinicos/db/session-auth";
+import type { SessionId } from "@clinicos/types/session";
 
 function headerValue(
   headers: IncomingHttpHeaders,
@@ -94,6 +95,7 @@ export async function authenticateRequest(
         };
 
   return {
+    sessionId: session.sessionId as SessionId,
     identity: userIdentity,
     context: tenantContext,
   };

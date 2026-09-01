@@ -201,3 +201,24 @@ Documentation is updated as part of the implementation workflow before significa
 - Validation: Vitest passed — 17 test files, 98 tests passed
 - Previous patient-access placeholder route was replaced by the real tenant/branch-scoped patient listing and creation routes
 - Current architecture remains the Phase 1 authenticated, tenant-aware API foundation
+
+
+## 2026-09-01 — API Session Logout Lifecycle Hardening
+
+- Added authenticated `POST /api/v1/logout`.
+- Logout authenticates through the existing API session-token boundary.
+- `AuthenticatedUser` now carries the authenticated `sessionId`.
+- Logout revocation is bound simultaneously to `sessionId`, `userId`, and `tenantId`.
+- Session revocation only affects an unrevo ked matching session.
+- A failed session revocation is rejected and does not report successful logout.
+- Successful logout creates a tenant/user/session-attributed audit event.
+- A revoked session can no longer authenticate subsequent API requests.
+- Added behavioral logout route coverage.
+- Added Phase 1 session-security regression coverage.
+- Accidental untracked file `tatus --short` was removed; it was confirmed to contain only captured diff output and was not part of the project.
+- Validation completed:
+  - `git diff --check` passed.
+  - Workspace TypeScript typecheck passed.
+  - Workspace ESLint passed.
+  - Vitest passed: 19 test files, 107 tests.
+- Current implementation remains within Phase 1 Platform / Identity and Security Foundation.

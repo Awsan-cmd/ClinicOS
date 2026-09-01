@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { SessionId } from "@clinicos/types/session";
 import { requirePermission } from "../src/authorization.js";
 import type { RequestContext } from "../src/context.js";
 
@@ -6,6 +7,7 @@ const context: RequestContext = {
   requestId: "request-1",
   correlationId: "correlation-1",
   authenticatedUser: {
+    sessionId: "session-test" as SessionId,
     identity: {
       userId: "user-1" as never,
       tenantId: "tenant-1" as never,

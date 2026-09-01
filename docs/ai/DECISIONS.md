@@ -476,3 +476,38 @@ Authorization conditions may prevent insertion. Callers must be able to distingu
 Device-session authorization must not trust tenant, device, or user identifiers supplied alongside a session identifier. The session is resolved first by its own identity, then its persisted tenant/device/user binding is compared explicitly with the request context. Current device state and current device-access state are also revalidated before authorization succeeds.
 
 A reusable `requireDeviceSession` helper converts denied authorization results into a typed `DeviceSessionAuthorizationError`, allowing application boundaries to enforce the same security policy consistently.
+
+
+## Decision 045 — Authenticated Logout Is Session-Bound
+
+ClinicOS logout must revoke the exact authenticated session represented by the bearer token.
+
+The revocation operation is bound to:
+
+- session identity
+- authenticated user identity
+- authenticated tenant identity
+
+Reason:
+
+A logout endpoint must not accept arbitrary session identifiers or allow a valid authenticated principal to revoke another user's or another tenant's session. Binding the mutation to the complete authenticated relationship preserves tenant isolation and identity integrity.
+
+---
+
+## Decision 046 — Logout Must Invalidate Authentication Immediately
+
+A successfully logged-out session must become unusable for subsequent API authentication.
+
+Reason:
+
+Logout is an authentication-state transition, not merely an informational API action. The active-session lookup therefore excludes revoked sessions, ensuring the same bearer token cannot continue accessing protected API routes.
+
+---
+
+## Decision 047 — Logout Is Audited
+
+Successful logout is recorded as a tenant-bound audit event attributed to the authenticated user and session.
+
+Reason:
+
+Authentication lifecycle events are security-relevant operational events. Recording the tenant, user, session, and request/correlation context provides traceability without exposing the raw bearer token.

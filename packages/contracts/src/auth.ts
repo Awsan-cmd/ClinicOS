@@ -1,7 +1,9 @@
 import type { TenantContext } from "./tenant.js";
+import type { SessionId } from "@clinicos/types/session";
 import type { UserIdentity } from "@clinicos/types/identity";
 
 export interface AuthenticatedUser {
+  sessionId: SessionId;
   identity: UserIdentity;
   context: TenantContext;
 }

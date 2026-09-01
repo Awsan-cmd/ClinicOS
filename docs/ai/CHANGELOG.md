@@ -813,3 +813,39 @@ Validation:
 - Git diff check passed
 
 Commit pushed to `origin/main`.
+
+
+## 2026-09-01 — API Logout and Session Revocation Hardening
+
+Implemented the authenticated API logout lifecycle.
+
+Added:
+
+- `POST /api/v1/logout`
+- authenticated session identity propagation through `AuthenticatedUser.sessionId`
+- tenant/user/session-bound authenticated session revocation
+- successful logout audit event
+- regression coverage for authentication requirement
+- regression coverage for successful session revocation
+- regression coverage proving a logged-out token cannot authenticate again
+- regression coverage for failed revocation
+- Phase 1 authenticated-session security regression tests
+
+Security review:
+
+- Logout cannot revoke a session belonging to another user.
+- Logout cannot revoke a session belonging to another tenant.
+- Already-revoked sessions are not treated as successful revocations.
+- Expired or revoked sessions remain outside the active-session authentication path.
+- Raw session tokens remain unpersisted; authentication continues to use token hashes.
+- Logout attribution is written to the tenant-bound audit stream.
+
+Validation:
+
+- `git diff --check` passed.
+- Workspace TypeScript typecheck passed.
+- Workspace ESLint passed.
+- Vitest: 19 test files passed.
+- Vitest: 107 tests passed.
+
+The implementation is ready for a versioned repository recovery point.

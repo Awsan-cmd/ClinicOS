@@ -50,3 +50,26 @@ export async function revokeSession(
     [sessionId],
   );
 }
+
+export async function revokeAuthenticatedSession(
+  pool: Pool,
+  session: {
+    sessionId: string;
+    userId: string;
+    tenantId: string;
+  },
+): Promise<boolean> {
+  const result = await pool.query(
+    `
+      UPDATE sessions
+      SET revoked_at = NOW()
+      WHERE id = $1
+        AND user_id = $2
+        AND tenant_id = $3
+        AND revoked_at IS NULL
+    `,
+    [session.sessionId, session.userId, session.tenantId],
+  );
+
+  return result.rowCount === 1;
+}

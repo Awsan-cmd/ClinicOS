@@ -10,7 +10,7 @@ import { createRequestContext } from "./context.js";
 import { ApiError, toApiError } from "./errors.js";
 import { sendError } from "./http.js";
 import { handleHealth } from "./routes/health.js";
-import { handleMe } from "./routes/me.js";
+import { handleLogout, handleMe } from "./routes/me.js";
 import {
   handleCreatePatient,
   handlePatients,
@@ -78,6 +78,28 @@ async function route(
     }
 
     await handlePatients(
+      request,
+      response,
+      pool,
+      context,
+    );
+    return;
+  }
+
+  if (
+    method === "POST" &&
+    url.pathname === "/api/v1/logout"
+  ) {
+    const authenticatedUser = await authenticateRequest(
+      pool,
+      request.headers,
+    );
+
+    if (authenticatedUser) {
+      context.authenticatedUser = authenticatedUser;
+    }
+
+    await handleLogout(
       request,
       response,
       pool,
