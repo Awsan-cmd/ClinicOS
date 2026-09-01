@@ -209,7 +209,7 @@ Documentation is updated as part of the implementation workflow before significa
 - Logout authenticates through the existing API session-token boundary.
 - `AuthenticatedUser` now carries the authenticated `sessionId`.
 - Logout revocation is bound simultaneously to `sessionId`, `userId`, and `tenantId`.
-- Session revocation only affects an unrevo ked matching session.
+- Session revocation only affects an unrevoked matching session.
 - A failed session revocation is rejected and does not report successful logout.
 - Successful logout creates a tenant/user/session-attributed audit event.
 - A revoked session can no longer authenticate subsequent API requests.
