@@ -9,6 +9,8 @@ export type Permission =
   | "user:manage"
   | "staff:read"
   | "staff:manage"
+  | "provider:read"
+  | "provider:manage"
   | "patient:read"
   | "patient:manage"
   | "appointment:read"
@@ -33,6 +35,8 @@ export const ROLE_PERMISSIONS: Readonly<
     "user:manage",
     "staff:read",
     "staff:manage",
+    "provider:read",
+    "provider:manage",
     "patient:read",
     "patient:manage",
     "appointment:read",
@@ -53,6 +57,8 @@ export const ROLE_PERMISSIONS: Readonly<
     "user:manage",
     "staff:read",
     "staff:manage",
+    "provider:read",
+    "provider:manage",
     "patient:read",
     "patient:manage",
     "appointment:read",
@@ -70,6 +76,8 @@ export const ROLE_PERMISSIONS: Readonly<
     "user:read",
     "staff:read",
     "staff:manage",
+    "provider:read",
+    "provider:manage",
     "patient:read",
     "patient:manage",
     "appointment:read",
@@ -81,6 +89,7 @@ export const ROLE_PERMISSIONS: Readonly<
   ],
   doctor: [
     "staff:read",
+    "provider:read",
     "branch:read",
     "patient:read",
     "patient:manage",
@@ -91,6 +100,7 @@ export const ROLE_PERMISSIONS: Readonly<
   ],
   receptionist: [
     "staff:read",
+    "provider:read",
     "branch:read",
     "patient:read",
     "patient:manage",
@@ -99,6 +109,7 @@ export const ROLE_PERMISSIONS: Readonly<
   ],
   nurse: [
     "staff:read",
+    "provider:read",
     "branch:read",
     "patient:read",
     "patient:manage",

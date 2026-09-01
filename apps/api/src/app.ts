@@ -16,6 +16,10 @@ import {
   handleStaff,
 } from "./routes/staff.js";
 import {
+  handleCreateProvider,
+  handleProviders,
+} from "./routes/providers.js";
+import {
   handleCreatePatient,
   handlePatients,
 } from "./routes/patient-access.js";
@@ -121,6 +125,45 @@ async function route(
     );
     return;
   }
+
+  if (
+    method === "GET" &&
+    url.pathname === "/api/v1/providers"
+  ) {
+    await requireAuthenticatedRequest(
+      pool,
+      request.headers,
+      context,
+    );
+
+    await handleProviders(
+      request,
+      response,
+      pool,
+      context,
+    );
+    return;
+  }
+
+  if (
+    method === "POST" &&
+    url.pathname === "/api/v1/providers"
+  ) {
+    await requireAuthenticatedRequest(
+      pool,
+      request.headers,
+      context,
+    );
+
+    await handleCreateProvider(
+      request,
+      response,
+      pool,
+      context,
+    );
+    return;
+  }
+
 
   if (
     method === "POST" &&

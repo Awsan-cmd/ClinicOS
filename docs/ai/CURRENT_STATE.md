@@ -2,11 +2,11 @@
 
 ## Current Stage
 
-Phase 2A — Staff.
+Phase 2B — Provider Management.
 
 ## Verified Recovery Point
 
-- Latest verified functional commit: `c5fc751` — `security(api): close phase1 authentication boundary`.
+- Latest verified functional commit: `88155c1` — `feat(api): implement phase2a staff management`.
 - Latest repository documentation commit: `ca5d32b` — `docs(ai): reconcile project memory with current state`.
 - Phase 1 device-session enforcement and revocation foundations are implemented.
 - Required device-session enforcement helper is implemented.
@@ -152,7 +152,7 @@ Documentation is updated as part of the implementation workflow before significa
 ## Current Recovery Point
 
 - `main` is synchronized with `origin/main`.
-- Latest commit: `c5fc751`.
+- Latest commit: `88155c1`.
 - Working tree is clean.
 - Latest functional change: API request context is created once per request and reused by the routing layer.
 - This prevents duplicate request-context creation and keeps the same authenticated context throughout request processing.
@@ -176,8 +176,8 @@ Documentation is updated as part of the implementation workflow before significa
 
 - Verified: 2026-09-01
 - Branch: `main`
-- HEAD: `66fe637`
-- `origin/main`: `66fe637`
+- HEAD: `88155c1`
+- `origin/main`: `88155c1`
 - Working tree: clean
 - Latest commit: `docs(ai): record patient creation API`
 - Patient database migration: `database/migrations/0008_patients.sql`
@@ -271,6 +271,52 @@ Validation completed:
 - Lint passed.
 - `git diff --check` passed.
 
-The next verified recovery point will be the Phase 2A Staff implementation commit after final diff review and remote verification.
+The verified Phase 2A Staff recovery point is `88155c1` after final diff review and remote verification.
 
-Providers and Calendar are not started and remain outside the current implementation scope.
+### Phase 2B — Provider Management
+
+Provider management is implemented as the second Phase 2 domain slice.
+
+Implemented components:
+
+- `database/migrations/0009_staff_providers.sql`
+- `packages/types/src/staff.ts`
+- `packages/types/src/permission.ts`
+- `packages/db/src/staff.ts`
+- `apps/api/src/routes/providers.ts`
+- `apps/api/tests/provider-route.test.ts`
+
+API endpoints:
+
+- `GET /api/v1/providers`
+- `POST /api/v1/providers`
+
+Security and data-boundary guarantees:
+
+- Providers are tenant-scoped.
+- Providers are backed by existing tenant-bound staff members.
+- Provider listing follows the authenticated tenant and branch context.
+- Provider creation validates the staff-member relationship within the authenticated tenant and branch context.
+- Branch-context users cannot create providers outside their authenticated branch.
+- `(tenant_id, staff_member_id)` uniqueness prevents duplicate provider registration within a tenant.
+- Provider creation records the authenticated actor through the `provider.created` audit event.
+- Provider type values are restricted to the centralized supported provider types.
+- Tenant-aware database constraints prevent cross-tenant provider/staff associations.
+
+Permissions:
+
+- `provider:read`
+- `provider:manage`
+
+Validation completed:
+
+- Provider route tests: 9 tests passed.
+- Full test suite: 21 test files passed.
+- Full test suite: 126 tests passed.
+- Typecheck passed.
+- Lint passed.
+- `git diff --check` passed.
+
+Phase 2B remains limited to Provider management. Services, Calendar, Scheduling, and Appointment lifecycle work remain outside the current implementation scope.
+
+The verified Phase 2B recovery point will be established after final documentation review, commit, push, and remote verification.

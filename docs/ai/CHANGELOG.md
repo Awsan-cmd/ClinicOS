@@ -880,3 +880,33 @@ Implemented the first Phase 2 domain slice: Staff management.
 - `git diff --check` passed.
 
 Providers and Calendar remain outside the scope of this change and have not been started.
+
+---
+
+## 2026-09-02 — Phase 2B Provider Management
+
+Implemented the Phase 2B Provider foundation and API.
+
+Added:
+
+- tenant-bound provider records backed by staff members
+- provider listing with tenant and authenticated branch scoping
+- provider creation with authenticated actor attribution
+- `provider:read` and `provider:manage` permissions
+- provider type validation
+- tenant-aware staff/provider relationship enforcement
+- duplicate provider registration protection
+- `provider.created` audit events
+- API security and validation tests
+
+Verified:
+
+- Provider route tests: 9 tests passed
+- Full test suite: 126 tests passed across 21 test files
+- TypeScript typecheck passed
+- ESLint passed
+- `git diff --check` passed
+
+Phase 2B remains limited to Provider management. Services, Calendar, Scheduling, and Appointment lifecycle work remain outside this phase.
+
+Current verified recovery point will be established after the final Phase 2B documentation, diff review, commit, push, and remote verification.

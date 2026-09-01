@@ -67,6 +67,174 @@ export async function findStaff(
   }));
 }
 
+export interface FindProvidersOptions {
+  tenantId: string;
+  branchId?: string;
+}
+
+export interface CreateProviderInput {
+  id: string;
+  tenantId: string;
+  staffMemberId: string;
+  actorUserId: string;
+  branchId?: string;
+  providerType: ProviderType;
+  specialty?: string;
+  licenseNumber?: string;
+}
+
+export async function findProviders(
+  pool: Pool,
+  options: FindProvidersOptions,
+): Promise<ProviderRecord[]> {
+  const result = await pool.query<{
+    id: string;
+    tenant_id: string;
+    staff_member_id: string;
+    provider_type: ProviderType;
+    specialty: string | null;
+    license_number: string | null;
+    created_at: Date;
+  }>(
+    `
+      SELECT
+        p.id,
+        p.tenant_id,
+        p.staff_member_id,
+        p.provider_type,
+        p.specialty,
+        p.license_number,
+        p.created_at
+      FROM providers p
+      INNER JOIN staff_members s
+        ON s.tenant_id = p.tenant_id
+       AND s.id = p.staff_member_id
+      WHERE p.tenant_id = $1
+        AND ($2::uuid IS NULL OR s.branch_id = $2::uuid)
+      ORDER BY p.created_at ASC, p.id ASC
+    `,
+    [options.tenantId, options.branchId ?? null],
+  );
+
+  return result.rows.map((row) => ({
+    id: row.id,
+    tenantId: row.tenant_id,
+    staffMemberId: row.staff_member_id,
+    providerType: row.provider_type,
+    ...(row.specialty !== null ? { specialty: row.specialty } : {}),
+    ...(row.license_number !== null
+      ? { licenseNumber: row.license_number }
+      : {}),
+    createdAt: row.created_at.toISOString(),
+  }));
+}
+
+export async function createProvider(
+  pool: Pool,
+  input: CreateProviderInput,
+): Promise<ProviderRecord> {
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    const staffResult = await client.query<{
+      id: string;
+    }>(
+      `
+        SELECT id
+        FROM staff_members
+        WHERE id = $1
+          AND tenant_id = $2
+          AND ($3::uuid IS NULL OR branch_id = $3::uuid)
+        FOR SHARE
+      `,
+      [input.staffMemberId, input.tenantId, input.branchId ?? null],
+    );
+
+    if (staffResult.rowCount === 0) {
+      throw new Error("provider_staff_not_found");
+    }
+
+    const providerResult = await client.query<{
+      id: string;
+      tenant_id: string;
+      staff_member_id: string;
+      provider_type: ProviderType;
+      specialty: string | null;
+      license_number: string | null;
+      created_at: Date;
+    }>(
+      `
+        INSERT INTO providers (
+          id,
+          tenant_id,
+          staff_member_id,
+          provider_type,
+          specialty,
+          license_number
+        )
+        VALUES ($1, $2, $3, $4, $5, $6)
+        RETURNING
+          id,
+          tenant_id,
+          staff_member_id,
+          provider_type,
+          specialty,
+          license_number,
+          created_at
+      `,
+      [
+        input.id,
+        input.tenantId,
+        input.staffMemberId,
+        input.providerType,
+        input.specialty ?? null,
+        input.licenseNumber ?? null,
+      ],
+    );
+
+    const row = providerResult.rows[0];
+
+    if (!row) {
+      throw new Error("provider_insert_failed");
+    }
+
+    await createAuditEvent(client, {
+      id: randomUUID(),
+      tenantId: input.tenantId,
+      userId: input.actorUserId,
+      ...(input.branchId ? { branchId: input.branchId } : {}),
+      action: "provider.created",
+      resource: "provider",
+      resourceId: row.id,
+      metadata: {
+        staffMemberId: row.staff_member_id,
+        providerType: row.provider_type,
+      },
+    });
+
+    await client.query("COMMIT");
+
+    return {
+      id: row.id,
+      tenantId: row.tenant_id,
+      staffMemberId: row.staff_member_id,
+      providerType: row.provider_type,
+      ...(row.specialty !== null ? { specialty: row.specialty } : {}),
+      ...(row.license_number !== null
+        ? { licenseNumber: row.license_number }
+        : {}),
+      createdAt: row.created_at.toISOString(),
+    };
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
 export async function createStaff(
   pool: Pool,
   input: {

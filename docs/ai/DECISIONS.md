@@ -542,3 +542,21 @@ Staff listing is filtered by the authenticated tenant and branch context. Staff 
 ### 051 — Staff registration is unique per tenant
 
 A user can have at most one staff membership within a tenant. This is enforced by `UNIQUE (tenant_id, user_id)` at the database layer, with duplicate registration exposed by the API as `409 Conflict`.
+
+### 052 — Providers are staff-backed clinical records
+
+Providers are modeled as clinical records linked to an existing staff member rather than as independent user records.
+
+Provider registration therefore requires an existing tenant-bound staff member and preserves the staff-to-user relationship already established by the Staff foundation.
+
+### 053 — Provider registration is unique per staff member
+
+A staff member may be registered as a provider at most once within a tenant.
+
+The database enforces this invariant with a tenant-aware unique constraint on `(tenant_id, staff_member_id)`, while the API returns a conflict response for duplicate registration attempts.
+
+### 054 — Provider branch scope follows staff branch scope
+
+Provider branch visibility and creation scope are inherited from the associated staff member and the authenticated branch context.
+
+Provider operations must not allow a provider to be created or listed outside the authenticated tenant or branch boundary.
