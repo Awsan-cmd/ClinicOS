@@ -511,3 +511,21 @@ Successful logout is recorded as a tenant-bound audit event attributed to the au
 Reason:
 
 Authentication lifecycle events are security-relevant operational events. Recording the tenant, user, session, and request/correlation context provides traceability without exposing the raw bearer token.
+
+---
+
+## Decision 048 — Authentication Boundary and Fail-Closed Authorization
+
+ClinicOS requires protected API routes to pass through a shared authentication boundary.
+
+The authentication boundary rejects requests when:
+- no valid active session is available;
+- the authenticated user is inactive.
+
+Authorization must fail closed when runtime role data is not mapped in the centralized role-to-permission matrix.
+
+An unmapped role therefore receives no permissions and results in authorization denial rather than an internal server error.
+
+Reason:
+
+Authentication and authorization are security boundaries. Protected routes should not duplicate authentication logic, inactive users must not reach authenticated handlers, and malformed or unexpected runtime role data must never accidentally bypass authorization or produce an unsafe permissive result.

@@ -137,4 +137,83 @@ describe("ClinicOS API authentication", () => {
       });
     }
   });
+
+  it("rejects an inactive user at the authentication boundary", async () => {
+    const pool = {
+      query: vi.fn()
+        .mockResolvedValueOnce({
+          rowCount: 1,
+          rows: [
+            {
+              id: "session-2",
+              user_id: "user-2",
+              tenant_id: "tenant-1",
+              branch_id: "branch-1",
+              expires_at: new Date("2030-01-01T00:00:00.000Z"),
+            },
+          ],
+        })
+        .mockResolvedValueOnce({
+          rowCount: 1,
+          rows: [
+            {
+              id: "user-2",
+              tenant_id: "tenant-1",
+              email: "inactive@example.com",
+              role: "doctor",
+              is_active: false,
+            },
+          ],
+        }),
+    };
+
+    const server = createApiServer(pool as never);
+
+    await new Promise<void>((resolve) => {
+      server.listen(0, "127.0.0.1", () => resolve());
+    });
+
+    const address = server.address();
+
+    if (!address || typeof address === "string") {
+      server.close();
+      throw new Error("Could not determine test server address.");
+    }
+
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:${address.port}/api/v1/me`,
+        {
+          headers: {
+            authorization: "Bearer inactive-session-token",
+          },
+        },
+      );
+
+      expect(response.status).toBe(401);
+
+      await expect(response.json()).resolves.toMatchObject({
+        data: {
+          error: {
+            code: "unauthorized",
+            message: "Authentication is required.",
+          },
+        },
+      });
+
+      expect(pool.query).toHaveBeenCalledTimes(2);
+    } finally {
+      await new Promise<void>((resolve, reject) => {
+        server.close((error) => {
+          if (error) {
+            reject(error);
+            return;
+          }
+
+          resolve();
+        });
+      });
+    }
+  });
+
 });

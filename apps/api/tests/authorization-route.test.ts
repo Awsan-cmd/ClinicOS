@@ -283,7 +283,7 @@ describe("ClinicOS protected API route", () => {
     }
   });
 
-  it("requires patient:manage to create a patient", async () => {
+  it("denies patient creation for an unmapped role", async () => {
     const pool = {
       query: vi.fn()
         .mockResolvedValueOnce({
@@ -304,9 +304,9 @@ describe("ClinicOS protected API route", () => {
             {
               id: "user-1",
               tenant_id: "tenant-1",
-              email: "inactive@example.com",
+              email: "active@example.com",
               role: "unknown",
-              is_active: false,
+              is_active: true,
             },
           ],
         }),

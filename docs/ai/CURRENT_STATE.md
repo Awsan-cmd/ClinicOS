@@ -222,3 +222,10 @@ Documentation is updated as part of the implementation workflow before significa
   - Workspace ESLint passed.
   - Vitest passed: 19 test files, 107 tests.
 - Current implementation remains within Phase 1 Platform / Identity and Security Foundation.
+
+- Protected API routes now use a shared required-authentication boundary.
+- Inactive users are rejected during authentication before reaching protected handlers.
+- Runtime roles not present in the centralized permission matrix fail closed with no permissions.
+- Authorization therefore returns denial rather than raising an internal error for an unmapped runtime role.
+- Phase 1 authentication/authorization security hardening is implemented and validated with the current test suite.
+- Current implementation recovery point is tracked by the latest verified Git commit.

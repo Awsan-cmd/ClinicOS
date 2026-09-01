@@ -8,6 +8,8 @@ import type { BranchId, TenantId, UserId } from "@clinicos/types/tenant";
 import { findUserIdentity } from "@clinicos/db/identity";
 import { findActiveSessionByTokenHash } from "@clinicos/db/session-auth";
 import type { SessionId } from "@clinicos/types/session";
+import type { RequestContext } from "./context.js";
+import { ApiError } from "./errors.js";
 
 function headerValue(
   headers: IncomingHttpHeaders,
@@ -72,7 +74,7 @@ export async function authenticateRequest(
     tenantId: session.tenantId,
   });
 
-  if (!identity) {
+  if (!identity || !identity.isActive) {
     return undefined;
   }
 
@@ -99,4 +101,27 @@ export async function authenticateRequest(
     identity: userIdentity,
     context: tenantContext,
   };
+}
+
+export async function requireAuthenticatedRequest(
+  pool: Pool,
+  headers: IncomingHttpHeaders,
+  context: RequestContext,
+): Promise<AuthenticatedUser> {
+  const authenticatedUser = await authenticateRequest(
+    pool,
+    headers,
+  );
+
+  if (!authenticatedUser) {
+    throw new ApiError(
+      401,
+      "unauthorized",
+      "Authentication is required.",
+    );
+  }
+
+  context.authenticatedUser = authenticatedUser;
+
+  return authenticatedUser;
 }

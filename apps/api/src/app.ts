@@ -5,7 +5,7 @@ import {
 } from "node:http";
 import { createDbPool } from "@clinicos/db/client";
 import type { Pool } from "pg";
-import { authenticateRequest } from "./auth.js";
+import { requireAuthenticatedRequest } from "./auth.js";
 import { createRequestContext } from "./context.js";
 import { ApiError, toApiError } from "./errors.js";
 import { sendError } from "./http.js";
@@ -46,14 +46,11 @@ async function route(
     method === "POST" &&
     url.pathname === "/api/v1/patients"
   ) {
-    const authenticatedUser = await authenticateRequest(
+    await requireAuthenticatedRequest(
       pool,
       request.headers,
+      context,
     );
-
-    if (authenticatedUser) {
-      context.authenticatedUser = authenticatedUser;
-    }
 
     await handleCreatePatient(
       request,
@@ -68,14 +65,11 @@ async function route(
     method === "GET" &&
     url.pathname === "/api/v1/patients"
   ) {
-    const authenticatedUser = await authenticateRequest(
+    await requireAuthenticatedRequest(
       pool,
       request.headers,
+      context,
     );
-
-    if (authenticatedUser) {
-      context.authenticatedUser = authenticatedUser;
-    }
 
     await handlePatients(
       request,
@@ -90,14 +84,11 @@ async function route(
     method === "POST" &&
     url.pathname === "/api/v1/logout"
   ) {
-    const authenticatedUser = await authenticateRequest(
+    await requireAuthenticatedRequest(
       pool,
       request.headers,
+      context,
     );
-
-    if (authenticatedUser) {
-      context.authenticatedUser = authenticatedUser;
-    }
 
     await handleLogout(
       request,
@@ -112,14 +103,11 @@ async function route(
     method === "GET" &&
     url.pathname === "/api/v1/me"
   ) {
-    const authenticatedUser = await authenticateRequest(
+    await requireAuthenticatedRequest(
       pool,
       request.headers,
+      context,
     );
-
-    if (authenticatedUser) {
-      context.authenticatedUser = authenticatedUser;
-    }
 
     handleMe(request, response, context);
     return;
