@@ -560,3 +560,21 @@ The database enforces this invariant with a tenant-aware unique constraint on `(
 Provider branch visibility and creation scope are inherited from the associated staff member and the authenticated branch context.
 
 Provider operations must not allow a provider to be created or listed outside the authenticated tenant or branch boundary.
+
+### 055 — Services are tenant-bound catalog records
+
+Services are modeled as tenant-bound catalog records with an optional branch scope.
+
+Each service carries a stable operational code, human-readable name, optional description, duration, active state, and creation timestamp. Services are not coupled to providers, scheduling, appointments, or billing in Phase 2C.
+
+### 056 — Service codes are unique within a tenant
+
+A service code may be registered at most once within a tenant.
+
+The database enforces this invariant with `UNIQUE (tenant_id, code)`, while duplicate registration attempts are exposed by the API as `409 Conflict`.
+
+### 057 — Service branch scope follows authenticated branch context
+
+Service visibility and creation scope follow the authenticated branch context.
+
+Branch-scoped service operations must remain inside the authenticated tenant and branch boundary. A supplied branch is validated against the authenticated tenant, and branch-context users cannot create services outside their authenticated branch.

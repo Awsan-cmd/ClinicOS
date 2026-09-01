@@ -20,6 +20,10 @@ import {
   handleProviders,
 } from "./routes/providers.js";
 import {
+  handleCreateService,
+  handleServices,
+} from "./routes/services.js";
+import {
   handleCreatePatient,
   handlePatients,
 } from "./routes/patient-access.js";
@@ -156,6 +160,44 @@ async function route(
     );
 
     await handleCreateProvider(
+      request,
+      response,
+      pool,
+      context,
+    );
+    return;
+  }
+
+  if (
+    method === "GET" &&
+    url.pathname === "/api/v1/services"
+  ) {
+    await requireAuthenticatedRequest(
+      pool,
+      request.headers,
+      context,
+    );
+
+    await handleServices(
+      request,
+      response,
+      pool,
+      context,
+    );
+    return;
+  }
+
+  if (
+    method === "POST" &&
+    url.pathname === "/api/v1/services"
+  ) {
+    await requireAuthenticatedRequest(
+      pool,
+      request.headers,
+      context,
+    );
+
+    await handleCreateService(
       request,
       response,
       pool,

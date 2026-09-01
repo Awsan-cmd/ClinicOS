@@ -11,6 +11,37 @@
 - Verified `git diff --check`.
 - Latest repository recovery point: `53ab23f`.
 
+## 2026-09-02 — Phase 2C Service Management
+
+Implemented the Phase 2C Service Catalog / Service Management slice.
+
+Added:
+
+- Tenant-bound `services` database table with optional branch scope.
+- Service code uniqueness within a tenant.
+- Positive service duration enforcement.
+- Active/inactive service state with active-by-default behavior.
+- Service type contract in `@clinicos/types`.
+- `service:read` and `service:manage` permissions.
+- `GET /api/v1/services`.
+- `POST /api/v1/services`.
+- Authenticated tenant and branch-context enforcement.
+- Cross-tenant and out-of-branch protection.
+- Authenticated actor attribution through the `service.created` audit event.
+- Duplicate service-code conflict handling.
+- Service API security and validation coverage.
+
+Validation completed:
+
+- Service route tests: 10 tests passed.
+- Full test suite: 22 test files passed.
+- Full test suite: 136 tests passed.
+- Workspace TypeScript typecheck passed.
+- Workspace ESLint passed.
+- `git diff --check` passed.
+
+Phase 2C remains limited to Service Catalog / Service Management. Calendar, Scheduling, Appointment lifecycle, Provider availability, pricing, billing integration, and service-to-provider scheduling remain outside the current implementation scope.
+
 # ClinicOS Development Changelog
 
 This file records the historical and ongoing implementation progress of ClinicOS.

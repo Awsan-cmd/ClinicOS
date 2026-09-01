@@ -2,7 +2,7 @@
 
 ## Current Stage
 
-Phase 2B — Provider Management.
+Phase 2C — Service Management.
 
 ## Verified Recovery Point
 
@@ -317,6 +317,53 @@ Validation completed:
 - Lint passed.
 - `git diff --check` passed.
 
-Phase 2B remains limited to Provider management. Services, Calendar, Scheduling, and Appointment lifecycle work remain outside the current implementation scope.
+Phase 2B remains limited to Provider management. Services are implemented separately in Phase 2C; Calendar, Scheduling, and Appointment lifecycle work remain outside the current implementation scope.
 
-The verified Phase 2B recovery point will be established after final documentation review, commit, push, and remote verification.
+### Phase 2C — Service Management
+
+Service Catalog / Service Management is implemented as the third Phase 2 domain slice.
+
+Implemented components:
+
+- `database/migrations/0010_services.sql`
+- `packages/types/src/service.ts`
+- `packages/types/src/permission.ts`
+- `packages/db/src/services.ts`
+- `apps/api/src/routes/services.ts`
+- `apps/api/tests/service-route.test.ts`
+
+API endpoints:
+
+- `GET /api/v1/services`
+- `POST /api/v1/services`
+
+Security and data-boundary guarantees:
+
+- Services are tenant-scoped.
+- Services may be branch-scoped.
+- Service listing follows the authenticated tenant and branch context.
+- Service creation inherits the authenticated branch when no branch is supplied.
+- Branch-context users cannot create services outside their authenticated branch.
+- Explicit branches are validated against the authenticated tenant.
+- `(tenant_id, code)` uniqueness prevents duplicate service registration within a tenant.
+- Service duration must be a positive integer.
+- Service creation records the authenticated actor through the `service.created` audit event.
+- Tenant-aware database constraints prevent cross-tenant branch associations.
+
+Permissions:
+
+- `service:read`
+- `service:manage`
+
+Validation completed:
+
+- Service route tests: 10 tests passed.
+- Full test suite: 22 test files passed.
+- Full test suite: 136 tests passed.
+- Typecheck passed.
+- Lint passed.
+- `git diff --check` passed.
+
+Phase 2C remains limited to Service Catalog / Service Management. Calendar, Scheduling, Appointment lifecycle, Provider availability, pricing, billing integration, and service-to-provider scheduling remain outside the current implementation scope.
+
+The Phase 2C recovery point will be established after final documentation review, commit, push, and remote verification.
