@@ -12,6 +12,10 @@ import { sendError } from "./http.js";
 import { handleHealth } from "./routes/health.js";
 import { handleLogout, handleMe } from "./routes/me.js";
 import {
+  handleCreateStaff,
+  handleStaff,
+} from "./routes/staff.js";
+import {
   handleCreatePatient,
   handlePatients,
 } from "./routes/patient-access.js";
@@ -72,6 +76,44 @@ async function route(
     );
 
     await handlePatients(
+      request,
+      response,
+      pool,
+      context,
+    );
+    return;
+  }
+
+  if (
+    method === "GET" &&
+    url.pathname === "/api/v1/staff"
+  ) {
+    await requireAuthenticatedRequest(
+      pool,
+      request.headers,
+      context,
+    );
+
+    await handleStaff(
+      request,
+      response,
+      pool,
+      context,
+    );
+    return;
+  }
+
+  if (
+    method === "POST" &&
+    url.pathname === "/api/v1/staff"
+  ) {
+    await requireAuthenticatedRequest(
+      pool,
+      request.headers,
+      context,
+    );
+
+    await handleCreateStaff(
       request,
       response,
       pool,

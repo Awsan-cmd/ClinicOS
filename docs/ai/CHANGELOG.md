@@ -849,3 +849,34 @@ Validation:
 - Vitest: 107 tests passed.
 
 The implementation is ready for a versioned repository recovery point.
+
+
+## 2026-09-02 — Phase 2A Staff
+
+Implemented the first Phase 2 domain slice: Staff management.
+
+### Implementation
+
+- Added Staff domain types in `packages/types/src/staff.ts`.
+- Added tenant- and branch-scoped Staff persistence in `packages/db/src/staff.ts`.
+- Added Staff API endpoints:
+  - `GET /api/v1/staff`
+  - `POST /api/v1/staff`
+- Added `staff:read` and `staff:manage` permissions.
+- Added validation that Staff users belong to the authenticated tenant and are active.
+- Added tenant validation for Staff branches.
+- Added authenticated branch-context enforcement.
+- Added composite tenant-aware foreign keys.
+- Added per-tenant Staff uniqueness through `(tenant_id, user_id)`.
+- Added `staff.created` audit events using the authenticated actor.
+- Added Staff security-boundary tests.
+
+### Validation
+
+- 20 test files passed.
+- 117 tests passed.
+- Typecheck passed.
+- Lint passed.
+- `git diff --check` passed.
+
+Providers and Calendar remain outside the scope of this change and have not been started.

@@ -529,3 +529,16 @@ An unmapped role therefore receives no permissions and results in authorization 
 Reason:
 
 Authentication and authorization are security boundaries. Protected routes should not duplicate authentication logic, inactive users must not reach authenticated handlers, and malformed or unexpected runtime role data must never accidentally bypass authorization or produce an unsafe permissive result.
+
+
+### 049 — Staff records are tenant-bound
+
+Staff records must carry `tenant_id`, and staff users must be validated against the authenticated tenant before creation. Database enforcement uses the composite `(tenant_id, user_id)` relationship to prevent cross-tenant associations.
+
+### 050 — Staff branch scope follows authenticated branch context
+
+Staff listing is filtered by the authenticated tenant and branch context. Staff creation inherits the authenticated branch when no branch is supplied and rejects an explicitly supplied branch outside that authenticated branch context.
+
+### 051 — Staff registration is unique per tenant
+
+A user can have at most one staff membership within a tenant. This is enforced by `UNIQUE (tenant_id, user_id)` at the database layer, with duplicate registration exposed by the API as `409 Conflict`.

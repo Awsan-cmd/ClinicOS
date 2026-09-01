@@ -2,11 +2,11 @@
 
 ## Current Stage
 
-Phase 1 — Platform / Identity and Security Foundation.
+Phase 2A — Staff.
 
 ## Verified Recovery Point
 
-- Latest verified functional commit: `4789bd1` — `fix(api): reuse request context across routing`.
+- Latest verified functional commit: `c5fc751` — `security(api): close phase1 authentication boundary`.
 - Latest repository documentation commit: `ca5d32b` — `docs(ai): reconcile project memory with current state`.
 - Phase 1 device-session enforcement and revocation foundations are implemented.
 - Required device-session enforcement helper is implemented.
@@ -152,7 +152,7 @@ Documentation is updated as part of the implementation workflow before significa
 ## Current Recovery Point
 
 - `main` is synchronized with `origin/main`.
-- Latest commit: `4789bd1`.
+- Latest commit: `c5fc751`.
 - Working tree is clean.
 - Latest functional change: API request context is created once per request and reused by the routing layer.
 - This prevents duplicate request-context creation and keeps the same authenticated context throughout request processing.
@@ -164,7 +164,7 @@ Documentation is updated as part of the implementation workflow before significa
 - The resulting context is passed explicitly into the route handler.
 - The route handler no longer creates a second request context.
 - This preserves a single request-scoped authentication/context object throughout routing.
-- Commit: `4789bd1`.
+- Commit: `c5fc751`.
 - Validation:
   - TypeScript typecheck passed.
   - ESLint passed.
@@ -229,3 +229,48 @@ Documentation is updated as part of the implementation workflow before significa
 - Authorization therefore returns denial rather than raising an internal error for an unmapped runtime role.
 - Phase 1 authentication/authorization security hardening is implemented and validated with the current test suite.
 - Current implementation recovery point is tracked by the latest verified Git commit.
+
+## Current Implementation State
+
+### Phase 2A — Staff
+
+Staff management is now implemented as the first Phase 2 domain slice.
+
+Implemented components:
+
+- `database/migrations/0009_staff_providers.sql`
+- `packages/types/src/staff.ts`
+- `packages/db/src/staff.ts`
+- `apps/api/src/routes/staff.ts`
+- `apps/api/tests/staff-route.test.ts`
+- Staff permissions:
+  - `staff:read`
+  - `staff:manage`
+
+API endpoints:
+
+- `GET /api/v1/staff`
+- `POST /api/v1/staff`
+
+Security and data-boundary guarantees:
+
+- Staff records are tenant-scoped.
+- Staff listing follows the authenticated tenant and branch context.
+- Staff creation validates that the target user belongs to the authenticated tenant and is active.
+- Explicit branches are validated against the authenticated tenant.
+- Branch-context users cannot create staff outside their authenticated branch.
+- `(tenant_id, user_id)` uniqueness prevents duplicate staff registration within a tenant.
+- Staff creation records the authenticated actor through the `staff.created` audit event.
+- Composite tenant-aware foreign keys prevent cross-tenant user and staff associations.
+
+Validation completed:
+
+- 20 test files passed.
+- 117 tests passed.
+- Typecheck passed.
+- Lint passed.
+- `git diff --check` passed.
+
+The next verified recovery point will be the Phase 2A Staff implementation commit after final diff review and remote verification.
+
+Providers and Calendar are not started and remain outside the current implementation scope.

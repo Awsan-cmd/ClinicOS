@@ -17,7 +17,8 @@
     "./device-session-guard": "./src/device-session-guard.ts",
     "./identity": "./src/identity.ts",
     "./session-auth": "./src/session-auth.ts",
-    "./patients": "./src/patients.ts"
+    "./patients": "./src/patients.ts",
+    "./staff": "./src/staff.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
