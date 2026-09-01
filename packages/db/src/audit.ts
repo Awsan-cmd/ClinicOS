@@ -1,4 +1,7 @@
-import type { Pool } from "pg";
+import type {
+  Pool,
+  PoolClient,
+} from "pg";
 
 export interface CreateAuditEventRecord {
   id: string;
@@ -12,7 +15,7 @@ export interface CreateAuditEventRecord {
 }
 
 export async function createAuditEvent(
-  pool: Pool,
+  pool: Pool | PoolClient,
   event: CreateAuditEventRecord,
 ): Promise<void> {
   await pool.query(
