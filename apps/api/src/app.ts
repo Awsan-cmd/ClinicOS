@@ -16,8 +16,8 @@ async function route(
   request: IncomingMessage,
   response: ServerResponse,
   pool: Pool,
+  context: ReturnType<typeof createRequestContext>,
 ): Promise<void> {
-  const context = createRequestContext(request.headers);
   const method = request.method ?? "GET";
   const url = new URL(
     request.url ?? "/",
@@ -67,7 +67,7 @@ export function createApiServer(pool: Pool = createDbPool()) {
     const context = createRequestContext(request.headers);
 
     try {
-      await route(request, response, pool);
+      await route(request, response, pool, context);
     } catch (error) {
       const apiError = toApiError(error);
 
