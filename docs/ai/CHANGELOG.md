@@ -749,3 +749,31 @@ Validation:
 - Working tree clean.
 - Local `HEAD` matched `origin/main`.
 - Commit pushed to GitHub.
+
+---
+
+## 2026-09-01 — API Request Context Reuse
+
+Commit: `4789bd1`
+
+Hardened the API request lifecycle by ensuring that the request context is created once and passed through the routing layer.
+
+Changed:
+
+- `apps/api/src/app.ts`
+- Removed duplicate `createRequestContext()` execution from the route handler.
+- Passed the existing request context explicitly into `route()`.
+
+Reason:
+
+The request context represents request-scoped authentication and identity information. Creating it more than once could cause future authentication/authorization state to diverge during the same request.
+
+Validation:
+
+- TypeScript typecheck passed.
+- ESLint passed.
+- Vitest: 15 test files passed.
+- Vitest: 86 tests passed.
+- `git diff --check` passed.
+- Working tree clean after commit.
+- Local `HEAD` matched `origin/main`.

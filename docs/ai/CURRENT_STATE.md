@@ -6,8 +6,8 @@ Phase 1 — Platform / Identity and Security Foundation.
 
 ## Verified Recovery Point
 
-- Latest verified functional commit: `af166c9` — `feat(api): add session authentication and me endpoint`.
-- Latest repository documentation commit: `c2f9ee1` — `docs(ai): define Linux terminal development workflow`.
+- Latest verified functional commit: `4789bd1` — `fix(api): reuse request context across routing`.
+- Latest repository documentation commit: `ca5d32b` — `docs(ai): reconcile project memory with current state`.
 - Phase 1 device-session enforcement and revocation foundations are implemented.
 - Required device-session enforcement helper is implemented.
 - Full test suite currently validates the Phase 1 platform foundation.
@@ -152,6 +152,22 @@ Documentation is updated as part of the implementation workflow before significa
 ## Current Recovery Point
 
 - `main` is synchronized with `origin/main`.
-- Latest commit: `c2f9ee1`.
-- Working tree was clean after the Linux workflow documentation commit.
-- The previous `53ab23f` recovery point is historical, not current.
+- Latest commit: `4789bd1`.
+- Working tree is clean.
+- Latest functional change: API request context is created once per request and reused by the routing layer.
+- This prevents duplicate request-context creation and keeps the same authenticated context throughout request processing.
+- The previous `af166c9`, `c2f9ee1`, and `ca5d32b` commits remain historical recovery points.
+
+## Latest API Request Context Hardening
+
+- `createRequestContext()` is executed once for each incoming API request.
+- The resulting context is passed explicitly into the route handler.
+- The route handler no longer creates a second request context.
+- This preserves a single request-scoped authentication/context object throughout routing.
+- Commit: `4789bd1`.
+- Validation:
+  - TypeScript typecheck passed.
+  - ESLint passed.
+  - Vitest: 15 test files passed.
+  - Vitest: 86 tests passed.
+  - `git diff --check` passed.

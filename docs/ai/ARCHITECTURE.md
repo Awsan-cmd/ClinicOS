@@ -26,3 +26,21 @@ The API must not trust tenant, branch, user, or device identifiers supplied inde
 Authorization remains a separate concern and must be enforced through the centralized permission model before sensitive domain operations.
 
 The `/api/v1/me` endpoint is the initial verified API identity boundary.
+
+## Request Context Lifecycle
+
+Each incoming API request creates exactly one request-scoped context.
+
+The context is created at the HTTP server boundary and passed explicitly into the route handler.
+
+Flow:
+
+HTTP request
+→ create request context once
+→ route handler receives same context
+→ authentication / authorization
+→ endpoint handler
+
+Route handlers must not recreate the request context.
+
+This guarantees that authentication and authorization decisions within one request operate on the same request-scoped identity/context object.
