@@ -174,15 +174,13 @@ Documentation is updated as part of the implementation workflow before significa
 
 ## Latest Verified Repository Snapshot
 
-- Verified: 2026-09-01
+- Verified: 2026-09-02
 - Branch: `main`
-- HEAD: `88155c1`
-- `origin/main`: `88155c1`
-- Working tree: clean
-- Latest commit: `docs(ai): record patient creation API`
+- Current recovery point is the pending Phase 2D / migration-integrity change set.
+- Phase 2A Staff, Phase 2B Providers, Phase 2C Services, and Phase 2D Patients are implemented.
 - Patient database migration: `database/migrations/0008_patients.sql`
+- Patient branch-integrity migration: `database/migrations/0011_patients_tenant_branch_fk.sql`
 - Patient DB access: `packages/db/src/patients.ts`
-- DB package export: `@clinicos/db/patients`
 - API routes:
   - `GET /api/v1/patients`
   - `POST /api/v1/patients`
@@ -192,15 +190,17 @@ Documentation is updated as part of the implementation workflow before significa
 - Branch scoping: uses authenticated user's `branchId` when present
 - Patient creation persists tenant, optional branch, creator identity, demographic/contact fields, and audit event
 - Patient medical record number uniqueness: database constraint `UNIQUE (tenant_id, medical_record_number)`
+- Patient branch references are tenant-aware at the database layer.
 - Duplicate medical record numbers return API `409 conflict`
 - Patient creation and audit event are committed transactionally
-- Integration coverage: patient authorization and creation route tests
-- Validation: `git diff --check` passed
-- Validation: workspace TypeScript typecheck passed
-- Validation: workspace ESLint passed
-- Validation: Vitest passed — 17 test files, 98 tests passed
-- Previous patient-access placeholder route was replaced by the real tenant/branch-scoped patient listing and creation routes
-- Current architecture remains the Phase 1 authenticated, tenant-aware API foundation
+- Repaired the historical migration chain by removing the duplicate/incomplete device definition from `0001_initial_tenancy.sql`; `0004_devices.sql` remains the canonical device migration.
+- Clean-database migration validation completed successfully through `0011_patients_tenant_branch_fk`.
+- Full validation:
+  - Vitest: 22 test files, 136 tests passed.
+  - Workspace TypeScript typecheck passed.
+  - Workspace ESLint passed.
+  - `git diff --check` passed.
+- Calendar, Scheduling, and Appointment lifecycle remain the next Phase 2 domain slices.
 
 
 ## 2026-09-01 — API Session Logout Lifecycle Hardening

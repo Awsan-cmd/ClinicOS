@@ -30,6 +30,12 @@ describe("ClinicOS Phase 1 database foundation", () => {
     expect(migration).toContain("CREATE TABLE tenants");
     expect(migration).toContain("CREATE TABLE branches");
     expect(migration).toContain("CREATE TABLE users");
-    expect(migration).toContain("CREATE TABLE devices");
+
+    const devicesMigration = readFileSync(
+      "database/migrations/0004_devices.sql",
+      "utf8",
+    );
+
+    expect(devicesMigration).toContain("CREATE TABLE devices");
   });
 });

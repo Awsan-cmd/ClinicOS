@@ -44,6 +44,39 @@ Phase 2C remains limited to Service Catalog / Service Management. Calendar, Sche
 
 # ClinicOS Development Changelog
 
+## 2026-09-02 — Phase 2D Patient Management and Migration Chain Repair
+
+Completed the Phase 2D Patient Management slice and repaired the database migration chain discovered during fresh-database validation.
+
+Patient management:
+
+- Tenant-scoped patient records with optional branch scope.
+- Medical record number uniqueness within a tenant.
+- `GET /api/v1/patients`.
+- `POST /api/v1/patients`.
+- `patient:read` and `patient:manage` permissions.
+- Authenticated tenant and branch-context enforcement.
+- Patient creation audit attribution through `patient.created`.
+- Validation for required fields and strict `YYYY-MM-DD` dates.
+- Duplicate medical record number conflict handling.
+
+Migration integrity:
+
+- Removed the duplicate/incomplete `devices` table definition from `0001_initial_tenancy.sql`.
+- Kept `0004_devices.sql` as the canonical full device schema migration.
+- Updated the Phase 1 migration test to verify the device table in `0004_devices.sql`.
+- Added `0011_patients_tenant_branch_fk.sql` to enforce tenant-aware patient branch foreign-key integrity.
+- Verified the complete migration chain on a clean PostgreSQL 17.11 database.
+
+Validation completed:
+
+- Full test suite: 22 test files passed.
+- Full test suite: 136 tests passed.
+- Workspace TypeScript typecheck passed.
+- Workspace ESLint passed.
+- `git diff --check` passed.
+
+
 This file records the historical and ongoing implementation progress of ClinicOS.
 
 ## 2026-08-30 — Master Specification Baseline

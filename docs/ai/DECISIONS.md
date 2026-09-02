@@ -90,6 +90,16 @@ Local infrastructure must be reproducible and aligned with the planned productio
 
 ---
 
+## Decision 008 — Tenant-Aware Branch Foreign Keys
+
+Entities that carry both `tenant_id` and an optional `branch_id` must enforce branch ownership at the database layer when the schema permits it.
+
+For patient records, the branch reference uses the composite relationship `(tenant_id, branch_id) -> branches(tenant_id, id)` so a patient cannot reference a branch belonging to another tenant.
+
+Reason:
+
+Application-level tenant and branch checks are necessary but insufficient as the final isolation boundary. Database constraints must prevent cross-tenant branch references even if an application path is bypassed or incorrectly implemented.
+
 ## Decision 007 — CI Foundation
 
 GitHub Actions validates:

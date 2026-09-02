@@ -24,17 +24,3 @@ CREATE TABLE users (
 
 CREATE INDEX users_tenant_id_idx
   ON users (tenant_id);
-
-CREATE TABLE devices (
-  id UUID PRIMARY KEY,
-  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
-  branch_id UUID REFERENCES branches(id) ON DELETE SET NULL,
-  name TEXT NOT NULL,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX devices_tenant_id_idx
-  ON devices (tenant_id);
-
-CREATE INDEX devices_branch_id_idx
-  ON devices (branch_id);
