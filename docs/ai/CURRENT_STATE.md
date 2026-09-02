@@ -6,7 +6,7 @@ Phase 2E — Calendar Foundation.
 
 ## Verified Recovery Point
 
-- Latest verified functional commit: `5a447e52d8253b6bde1734f41679d6d71179dc16` — `feat(api): complete phase2d patient management`.
+- Latest verified functional commit: `6d6ba07e93a7caccc256ef98a3da059ca633182a` — `feat(api): implement phase2e calendar foundation`.
 - Latest repository documentation commit: `18abbe3a3afb08e44251dbf6fbabaf7ed3c4b668` — `docs(ai): update phase2d recovery point`.
 - Phase 1 device-session enforcement and revocation foundations are implemented.
 - Required device-session enforcement helper is implemented.
@@ -22,7 +22,7 @@ Phase 2E — Calendar Foundation.
 - Verified typecheck, lint, and test execution.
 - Phase 0 infrastructure foundation completed and pushed.
 - Phase 1 tenancy foundation completed and pushed.
-- Phase 2E Calendar Foundation implemented and validated locally; final commit and remote verification are pending.
+- Phase 2E Calendar Foundation implemented, committed, pushed, and remotely verified.
 - Continuous documentation and recovery-point policy established.
 - Phase 1A database foundation completed and validated.
 - Phase 1B identity foundation implemented and validated.
@@ -153,9 +153,9 @@ Documentation is updated as part of the implementation workflow before significa
 ## Current Recovery Point
 
 - `main` is synchronized with `origin/main`.
-- Latest commit: `5a447e52d8253b6bde1734f41679d6d71179dc16` (`feat(api): complete phase2d patient management`).
+- Latest commit: `6d6ba07e93a7caccc256ef98a3da059ca633182a` (`feat(api): implement phase2e calendar foundation`).
 - Working tree is clean.
-- `LOCAL_HEAD == REMOTE_HEAD` verified after the Phase 2D push.
+- `LOCAL_HEAD == REMOTE_HEAD` verified after the Phase 2E push.
 - The previous `af166c9`, `c2f9ee1`, and `ca5d32b` commits remain historical recovery points.
 
 ## Latest API Request Context Hardening
@@ -176,8 +176,8 @@ Documentation is updated as part of the implementation workflow before significa
 
 - Verified: 2026-09-02
 - Branch: `main`
-- Current recovery point is the verified Phase 2D / migration-integrity commit: `5a447e52d8253b6bde1734f41679d6d71179dc16`.
-- Phase 2A Staff, Phase 2B Providers, Phase 2C Services, and Phase 2D Patients are implemented.
+- Current recovery point is the verified Phase 2E Calendar Foundation commit: `6d6ba07e93a7caccc256ef98a3da059ca633182a`.
+- Phase 2A Staff, Phase 2B Providers, Phase 2C Services, Phase 2D Patients, and Phase 2E Calendar Foundation are implemented.
 - Patient database migration: `database/migrations/0008_patients.sql`
 - Patient branch-integrity migration: `database/migrations/0011_patients_tenant_branch_fk.sql`
 - Patient DB access: `packages/db/src/patients.ts`
