@@ -2,12 +2,12 @@
 
 ## Current Stage
 
-Phase 2E — Calendar Foundation.
+Phase 2F — Scheduling / Appointment Foundation.
 
 ## Verified Recovery Point
 
-- Latest verified functional commit: `6d6ba07e93a7caccc256ef98a3da059ca633182a` — `feat(api): implement phase2e calendar foundation`.
-- Latest repository documentation commit: `18abbe3a3afb08e44251dbf6fbabaf7ed3c4b668` — `docs(ai): update phase2d recovery point`.
+- Latest verified functional commit: `f33fa53798f0577c6382f580b6c49ec744b408e2` — `feat(api): implement phase2f appointment foundation`.
+- Latest repository documentation commit: `dd1fbc60682916a617aa5334664b256fd7ac0517` — `docs(ai): update phase2e recovery point`.
 - Phase 1 device-session enforcement and revocation foundations are implemented.
 - Required device-session enforcement helper is implemented.
 - Full test suite currently validates the Phase 1 platform foundation.
@@ -23,6 +23,7 @@ Phase 2E — Calendar Foundation.
 - Phase 0 infrastructure foundation completed and pushed.
 - Phase 1 tenancy foundation completed and pushed.
 - Phase 2E Calendar Foundation implemented, committed, pushed, and remotely verified.
+- Phase 2F Scheduling / Appointment Foundation implemented, committed, pushed, and remotely verified.
 - Continuous documentation and recovery-point policy established.
 - Phase 1A database foundation completed and validated.
 - Phase 1B identity foundation implemented and validated.
@@ -153,7 +154,7 @@ Documentation is updated as part of the implementation workflow before significa
 ## Current Recovery Point
 
 - `main` is synchronized with `origin/main`.
-- Latest commit: `6d6ba07e93a7caccc256ef98a3da059ca633182a` (`feat(api): implement phase2e calendar foundation`).
+- Latest commit: `f33fa53798f0577c6382f580b6c49ec744b408e2` (`feat(api): implement phase2f appointment foundation`).
 - Working tree is clean.
 - `LOCAL_HEAD == REMOTE_HEAD` verified after the Phase 2E push.
 - The previous `af166c9`, `c2f9ee1`, and `ca5d32b` commits remain historical recovery points.
@@ -176,8 +177,8 @@ Documentation is updated as part of the implementation workflow before significa
 
 - Verified: 2026-09-02
 - Branch: `main`
-- Current recovery point is the verified Phase 2E Calendar Foundation commit: `6d6ba07e93a7caccc256ef98a3da059ca633182a`.
-- Phase 2A Staff, Phase 2B Providers, Phase 2C Services, Phase 2D Patients, and Phase 2E Calendar Foundation are implemented.
+- Current recovery point is the verified Phase 2F Appointment Foundation commit: `f33fa53798f0577c6382f580b6c49ec744b408e2`.
+- Phase 2A Staff, Phase 2B Providers, Phase 2C Services, Phase 2D Patients, Phase 2E Calendar Foundation, and Phase 2F Appointment Foundation are implemented.
 - Patient database migration: `database/migrations/0008_patients.sql`
 - Patient branch-integrity migration: `database/migrations/0011_patients_tenant_branch_fk.sql`
 - Patient DB access: `packages/db/src/patients.ts`
@@ -200,7 +201,7 @@ Documentation is updated as part of the implementation workflow before significa
   - Workspace TypeScript typecheck passed.
   - Workspace ESLint passed.
   - `git diff --check` passed.
-- Calendar Foundation is implemented and validated. Scheduling and Appointment lifecycle remain the next Phase 2 domain slices.
+- Calendar Foundation is implemented and validated. Appointment lifecycle remains the next Phase 2 scheduling slice.
 
 
 ## 2026-09-01 — API Session Logout Lifecycle Hardening
@@ -421,4 +422,46 @@ Validation completed:
 - `git diff --check` passed.
 - Clean-database migration validation completed successfully through `0012_calendar_foundation.sql`.
 
-Phase 2E is limited to Calendar Foundation. Appointment creation, booking/conflict detection, reschedule/cancel/no-show lifecycle, recurring appointments, waitlist, online booking, and calendar UI remain outside the current implementation scope.
+Phase 2E is limited to Calendar Foundation. Appointment creation, booking/conflict detection, reschedule/cancel/no-show lifecycle, recurring appointments, waitlist, online booking, and calendar UI remain outside the Phase 2E scope.
+
+### Phase 2F — Scheduling / Appointment Foundation
+
+Appointment Foundation is implemented as the next Phase 2 domain slice.
+
+Implemented components:
+
+- `database/migrations/0013_appointments.sql`
+- `packages/types/src/appointment.ts`
+- `packages/db/src/appointments.ts`
+- `apps/api/src/routes/appointments.ts`
+- `apps/api/tests/appointment-route.test.ts`
+
+API endpoints:
+
+- `GET /api/v1/appointments`
+- `POST /api/v1/appointments`
+
+Appointment Foundation guarantees:
+
+- Appointments are tenant-scoped.
+- Appointments may be branch-scoped.
+- Patient, provider, and service references are required and tenant-aware.
+- Resource references are optional and tenant-aware.
+- Appointment type and status values are constrained.
+- Appointment start time must be before end time.
+- Branch context is inherited from the authenticated user when not supplied.
+- Branch-context users cannot access or create appointments outside their authenticated branch.
+- Appointment creation records the authenticated actor through an audit event.
+- Appointment listing supports tenant, branch, patient, provider, and resource filtering.
+- Cross-tenant appointment references are rejected.
+
+Phase 2F validation:
+
+- Targeted appointment suite: 17 tests passed.
+- Full Vitest suite: 25 test files, 174 tests passed.
+- Workspace TypeScript typecheck passed.
+- Workspace ESLint passed.
+- `git diff --check` passed.
+- Clean-database migration validation completed successfully through `0013_appointments.sql`.
+
+Phase 2F is limited to Appointment Foundation. Conflict detection, reschedule, cancellation, no-show lifecycle operations, recurring appointments, waitlist, online booking, and calendar UI remain outside the current implementation scope.
