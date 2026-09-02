@@ -152,10 +152,9 @@ Documentation is updated as part of the implementation workflow before significa
 ## Current Recovery Point
 
 - `main` is synchronized with `origin/main`.
-- Latest commit: `88155c1`.
+- Latest commit: `5a447e52d8253b6bde1734f41679d6d71179dc16` (`feat(api): complete phase2d patient management`).
 - Working tree is clean.
-- Latest functional change: API request context is created once per request and reused by the routing layer.
-- This prevents duplicate request-context creation and keeps the same authenticated context throughout request processing.
+- `LOCAL_HEAD == REMOTE_HEAD` verified after the Phase 2D push.
 - The previous `af166c9`, `c2f9ee1`, and `ca5d32b` commits remain historical recovery points.
 
 ## Latest API Request Context Hardening
@@ -176,7 +175,7 @@ Documentation is updated as part of the implementation workflow before significa
 
 - Verified: 2026-09-02
 - Branch: `main`
-- Current recovery point is the pending Phase 2D / migration-integrity change set.
+- Current recovery point is the verified Phase 2D / migration-integrity commit: `5a447e52d8253b6bde1734f41679d6d71179dc16`.
 - Phase 2A Staff, Phase 2B Providers, Phase 2C Services, and Phase 2D Patients are implemented.
 - Patient database migration: `database/migrations/0008_patients.sql`
 - Patient branch-integrity migration: `database/migrations/0011_patients_tenant_branch_fk.sql`
