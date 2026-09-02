@@ -2,12 +2,12 @@
 
 ## Current Stage
 
-Phase 2G — Appointment Lifecycle.
+Phase 2H — Schedule Availability.
 
 ## Verified Recovery Point
 
-- Latest verified functional commit: `962f77a9f2dcc5aba7dcbc09bd2b69e8855b34cf` — `feat(api): implement phase2g appointment lifecycle`.
-- Latest repository documentation commit: `655019425847d04f040ad9aa29e1c2c1a560ec42` — `docs(ai): update phase2f recovery point`.
+- Latest verified functional commit: `e1e7df1531c63a8b0355abd1b7b9b249c779fcd5` — `feat(api): implement phase2h schedule availability`.
+- Latest repository documentation commit: pending — this documentation update.
 - Phase 1 device-session enforcement and revocation foundations are implemented.
 - Required device-session enforcement helper is implemented.
 - Full test suite currently validates the Phase 1 platform foundation.
@@ -25,6 +25,7 @@ Phase 2G — Appointment Lifecycle.
 - Phase 2E Calendar Foundation implemented, committed, pushed, and remotely verified.
 - Phase 2F Scheduling / Appointment Foundation implemented, committed, pushed, and remotely verified.
 - Phase 2G Appointment Lifecycle implemented, committed, pushed, and remotely verified.
+- Phase 2H Schedule Availability implemented, committed, pushed, and remotely verified.
 - Continuous documentation and recovery-point policy established.
 - Phase 1A database foundation completed and validated.
 - Phase 1B identity foundation implemented and validated.
@@ -155,7 +156,7 @@ Documentation is updated as part of the implementation workflow before significa
 ## Current Recovery Point
 
 - `main` is synchronized with `origin/main`.
-- Latest commit: `962f77a9f2dcc5aba7dcbc09bd2b69e8855b34cf` (`feat(api): implement phase2g appointment lifecycle`).
+- Latest commit: `e1e7df1531c63a8b0355abd1b7b9b249c779fcd5` (`feat(api): implement phase2h schedule availability`).
 - Working tree was clean after the Phase 2G functional commit.
 - `LOCAL_HEAD == REMOTE_HEAD` verified after the Phase 2G push.
 - The previous `af166c9`, `c2f9ee1`, and `ca5d32b` commits remain historical recovery points.
@@ -178,8 +179,8 @@ Documentation is updated as part of the implementation workflow before significa
 
 - Verified: 2026-09-02
 - Branch: `main`
-- Current recovery point is the verified Phase 2G Appointment Lifecycle commit: `962f77a9f2dcc5aba7dcbc09bd2b69e8855b34cf`.
-- Phase 2A Staff, Phase 2B Providers, Phase 2C Services, Phase 2D Patients, Phase 2E Calendar Foundation, Phase 2F Appointment Foundation, and Phase 2G Appointment Lifecycle are implemented.
+- Current recovery point is the verified Phase 2H Schedule Availability commit: `e1e7df1531c63a8b0355abd1b7b9b249c779fcd5`.
+- Phase 2A Staff, Phase 2B Providers, Phase 2C Services, Phase 2D Patients, Phase 2E Calendar Foundation, Phase 2F Appointment Foundation, Phase 2G Appointment Lifecycle, and Phase 2H Schedule Availability are implemented.
 - Patient database migration: `database/migrations/0008_patients.sql`
 - Patient branch-integrity migration: `database/migrations/0011_patients_tenant_branch_fk.sql`
 - Patient DB access: `packages/db/src/patients.ts`
@@ -488,3 +489,20 @@ Phase 2F validation:
 - Clean-database migration validation completed successfully through `0013_appointments.sql`.
 
 Phase 2F is limited to Appointment Foundation. Conflict detection, reschedule, cancellation, no-show lifecycle operations, recurring appointments, waitlist, online booking, and calendar UI remain outside the current implementation scope.
+
+
+## 2026-09-02 — Phase 2H Schedule Availability
+
+- Added `working_hours` with tenant and branch scope, day-of-week, local wall-clock start/end times, and active state.
+- Added `schedule_breaks` with tenant and branch scope, day-of-week, local wall-clock start/end times, and active state.
+- Added `holidays` with tenant scope and optional branch scope, date, optional name, full-day state, and active state.
+- Added GET/POST APIs for working hours, schedule breaks, and holidays.
+- Added dedicated read/manage permissions for all three schedule-availability resources.
+- Tenant and authenticated branch isolation are enforced.
+- Validation covers day-of-week, time format/ranges, and holiday dates.
+- Schedule mutations create audit events transactionally.
+- Tenant-wide holidays remain visible when listing holidays for a specific branch.
+- Out of scope for Phase 2H: slot calculation, conflict detection, booking rules, waitlist, recurring appointments, online booking, notifications, and calendar UI.
+- Functional commit: `e1e7df1531c63a8b0355abd1b7b9b249c779fcd5` — `feat(api): implement phase2h schedule availability`.
+- Validation completed: Vitest 26 files / 209 tests, workspace TypeScript typecheck, workspace ESLint, and `git diff --check` all passed.
+- Fresh PostgreSQL migration execution was not performed because `psql` is not installed in the current environment.
