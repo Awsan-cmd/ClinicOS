@@ -588,3 +588,11 @@ The database enforces this invariant with `UNIQUE (tenant_id, code)`, while dupl
 Service visibility and creation scope follow the authenticated branch context.
 
 Branch-scoped service operations must remain inside the authenticated tenant and branch boundary. A supplied branch is validated against the authenticated tenant, and branch-context users cannot create services outside their authenticated branch.
+
+### 058 — Appointment Types Are Tenant-Bound Catalog Records
+
+Appointment types are modeled as tenant-bound catalog records with an optional branch scope.
+
+Each appointment type carries a stable code, human-readable name, optional description, active state, and creation timestamp. Appointment type codes are unique within a tenant, and branch references are tenant-aware.
+
+Phase 2I establishes the appointment type catalog without changing the existing `appointments.appointment_type` field. Existing appointment compatibility is therefore preserved while later scheduling phases can decide when and how appointments should reference the catalog.

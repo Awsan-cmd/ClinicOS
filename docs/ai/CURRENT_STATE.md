@@ -2,11 +2,11 @@
 
 ## Current Stage
 
-Phase 2H — Schedule Availability.
+Phase 2I — Appointment Type Management.
 
 ## Verified Recovery Point
 
-- Latest verified functional commit: `e1e7df1531c63a8b0355abd1b7b9b249c779fcd5` — `feat(api): implement phase2h schedule availability`.
+- Latest verified functional commit: `f1a5a73c23344b223f5a3823b1983faba7ad1d93` — `feat(api): implement phase2i appointment type management`.
 - Latest repository documentation commit: pending — this documentation update.
 - Phase 1 device-session enforcement and revocation foundations are implemented.
 - Required device-session enforcement helper is implemented.
@@ -26,6 +26,7 @@ Phase 2H — Schedule Availability.
 - Phase 2F Scheduling / Appointment Foundation implemented, committed, pushed, and remotely verified.
 - Phase 2G Appointment Lifecycle implemented, committed, pushed, and remotely verified.
 - Phase 2H Schedule Availability implemented, committed, pushed, and remotely verified.
+- Phase 2I Appointment Type Management implemented, committed, pushed, and remotely verified.
 - Continuous documentation and recovery-point policy established.
 - Phase 1A database foundation completed and validated.
 - Phase 1B identity foundation implemented and validated.
@@ -125,6 +126,28 @@ Phase 2H — Schedule Availability.
 
 - Current repository recovery point is maintained by the latest verified commit.
 
+## Phase 2I — Appointment Type Management
+
+- Appointment types are modeled as tenant-bound catalog records.
+- Each appointment type has an optional branch scope, stable code, name, optional description, active state, and creation timestamp.
+- Appointment type codes are unique within a tenant.
+- Branch references are tenant-aware at the database layer.
+- `GET /api/v1/appointment-types` requires `appointment_type:read`.
+- `POST /api/v1/appointment-types` requires `appointment_type:manage`.
+- Appointment type listing and creation follow authenticated tenant and branch context.
+- Appointment type creation records an authenticated actor in the audit event.
+- Duplicate appointment type codes return API `409 Conflict`.
+- Invalid input and malformed JSON return API `400`.
+- Existing `appointments.appointment_type` remains unchanged for compatibility; catalog integration is deferred to a later phase.
+- Out of scope for Phase 2I: booking rules, conflict prevention, waitlist, recurring appointments, online booking, calendar UI, and appointment lifecycle changes.
+- Validation:
+  - Targeted appointment type suite: 10 tests passed.
+  - Full Vitest suite: 27 test files, 219 tests passed.
+  - Workspace TypeScript typecheck passed.
+  - Workspace ESLint passed.
+  - `git diff --check` passed.
+- Functional recovery point: `f1a5a73c23344b223f5a3823b1983faba7ad1d93`.
+
 ## Documentation System
 
 Development is documented continuously.
@@ -156,9 +179,9 @@ Documentation is updated as part of the implementation workflow before significa
 ## Current Recovery Point
 
 - `main` is synchronized with `origin/main`.
-- Latest commit: `e1e7df1531c63a8b0355abd1b7b9b249c779fcd5` (`feat(api): implement phase2h schedule availability`).
-- Working tree was clean after the Phase 2G functional commit.
-- `LOCAL_HEAD == REMOTE_HEAD` verified after the Phase 2G push.
+- Latest commit: `f1a5a73c23344b223f5a3823b1983faba7ad1d93` (`feat(api): implement phase2i appointment type management`).
+- Working tree was clean after the Phase 2I functional commit.
+- `LOCAL_HEAD == REMOTE_HEAD` verified after the Phase 2I push.
 - The previous `af166c9`, `c2f9ee1`, and `ca5d32b` commits remain historical recovery points.
 
 ## Latest API Request Context Hardening
@@ -179,7 +202,7 @@ Documentation is updated as part of the implementation workflow before significa
 
 - Verified: 2026-09-02
 - Branch: `main`
-- Current recovery point is the verified Phase 2H Schedule Availability commit: `e1e7df1531c63a8b0355abd1b7b9b249c779fcd5`.
+- Current recovery point is the verified Phase 2I Appointment Type Management commit: `f1a5a73c23344b223f5a3823b1983faba7ad1d93`.
 - Phase 2A Staff, Phase 2B Providers, Phase 2C Services, Phase 2D Patients, Phase 2E Calendar Foundation, Phase 2F Appointment Foundation, Phase 2G Appointment Lifecycle, and Phase 2H Schedule Availability are implemented.
 - Patient database migration: `database/migrations/0008_patients.sql`
 - Patient branch-integrity migration: `database/migrations/0011_patients_tenant_branch_fk.sql`
