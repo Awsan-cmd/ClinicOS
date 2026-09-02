@@ -24,6 +24,10 @@ import {
   handleServices,
 } from "./routes/services.js";
 import {
+  handleBookingRules,
+  handleCreateBookingRule,
+} from "./routes/booking-rules.js";
+import {
   handleCreateAppointmentType,
   handleAppointmentTypes,
 } from "./routes/appointment-types.js";
@@ -326,6 +330,44 @@ async function route(
     );
 
     await handleCreateAppointmentType(
+      request,
+      response,
+      pool,
+      context,
+    );
+    return;
+  }
+
+  if (
+    method === "GET" &&
+    url.pathname === "/api/v1/booking-rules"
+  ) {
+    await requireAuthenticatedRequest(
+      pool,
+      request.headers,
+      context,
+    );
+
+    await handleBookingRules(
+      request,
+      response,
+      pool,
+      context,
+    );
+    return;
+  }
+
+  if (
+    method === "POST" &&
+    url.pathname === "/api/v1/booking-rules"
+  ) {
+    await requireAuthenticatedRequest(
+      pool,
+      request.headers,
+      context,
+    );
+
+    await handleCreateBookingRule(
       request,
       response,
       pool,

@@ -29,6 +29,8 @@ export type Permission =
   | "appointment:manage"
   | "appointment_type:read"
   | "appointment_type:manage"
+  | "booking_rule:read"
+  | "booking_rule:manage"
   | "clinical:read"
   | "clinical:manage"
   | "billing:read"
@@ -76,6 +78,8 @@ export const ROLE_PERMISSIONS: Readonly<
     "device:read",
     "device:manage",
     "audit:read",
+    "booking_rule:read",
+    "booking_rule:manage",
   ],
   admin: [
     "tenant:read",
@@ -112,6 +116,8 @@ export const ROLE_PERMISSIONS: Readonly<
     "device:read",
     "device:manage",
     "audit:read",
+    "booking_rule:read",
+    "booking_rule:manage",
   ],
   manager: [
     "branch:read",
@@ -142,6 +148,8 @@ export const ROLE_PERMISSIONS: Readonly<
     "billing:read",
     "device:read",
     "audit:read",
+    "booking_rule:read",
+    "booking_rule:manage",
   ],
   doctor: [
     "staff:read",
@@ -160,6 +168,7 @@ export const ROLE_PERMISSIONS: Readonly<
     "appointment:manage",
     "clinical:read",
     "clinical:manage",
+    "booking_rule:read",
   ],
   receptionist: [
     "staff:read",
@@ -176,6 +185,7 @@ export const ROLE_PERMISSIONS: Readonly<
     "appointment:read",
     "appointment_type:read",
     "appointment:manage",
+    "booking_rule:read",
   ],
   nurse: [
     "staff:read",
@@ -193,5 +203,6 @@ export const ROLE_PERMISSIONS: Readonly<
     "appointment_type:read",
     "clinical:read",
     "clinical:manage",
+    "booking_rule:read",
   ],
 };

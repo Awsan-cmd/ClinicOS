@@ -18,6 +18,7 @@
     "./calendar": "./src/calendar.ts",
     "./schedule": "./src/schedule.ts",
     "./appointment": "./src/appointment.ts",
-    "./appointment-type": "./src/appointment-type.ts"
+    "./appointment-type": "./src/appointment-type.ts",
+    "./booking-rule": "./src/booking-rule.ts"
   }
 }
