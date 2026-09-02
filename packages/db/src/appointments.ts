@@ -277,3 +277,277 @@ export async function createAppointment(
     client.release();
   }
 }
+
+type AppointmentLifecycleAction =
+  | "confirm"
+  | "complete"
+  | "cancel"
+  | "no_show";
+
+type AppointmentLifecycleInput = {
+  id: string;
+  tenantId: string;
+  actorUserId: string;
+  branchId?: string | null;
+};
+
+async function transitionAppointment(
+  pool: Pool,
+  input: AppointmentLifecycleInput,
+  action: AppointmentLifecycleAction,
+  allowedStatuses: AppointmentStatus[],
+  nextStatus: AppointmentStatus,
+): Promise<AppointmentRecord> {
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    const result = await client.query(
+      `
+        WITH current_appointment AS (
+          SELECT
+            id,
+            status AS previous_status
+          FROM appointments
+          WHERE tenant_id = $1
+            AND id = $2
+            AND status = ANY($3::text[])
+            AND (
+              $5::uuid IS NULL
+              OR branch_id = $5
+            )
+          FOR UPDATE
+        ),
+        updated_appointment AS (
+          UPDATE appointments AS a
+          SET status = $4
+          FROM current_appointment AS current
+          WHERE a.id = current.id
+          RETURNING
+            a.id,
+            a.tenant_id,
+            a.branch_id,
+            a.patient_id,
+            a.provider_id,
+            a.service_id,
+            a.resource_id,
+            a.appointment_type,
+            a.status,
+            a.starts_at,
+            a.ends_at,
+            a.notes,
+            a.created_at
+        )
+        SELECT
+          updated_appointment.*,
+          current_appointment.previous_status
+        FROM updated_appointment
+        JOIN current_appointment
+          ON current_appointment.id = updated_appointment.id
+      `,
+      [
+        input.tenantId,
+        input.id,
+        allowedStatuses,
+        nextStatus,
+        input.branchId ?? null,
+      ],
+    );
+
+    if (result.rowCount !== 1) {
+      throw new Error(
+        `appointment_transition_not_allowed:${action}`,
+      );
+    }
+
+    const appointment = mapAppointment(result.rows[0]);
+
+    await createAuditEvent(client, {
+      id: randomUUID(),
+      tenantId: input.tenantId,
+      userId: input.actorUserId,
+      ...(appointment.branchId
+        ? { branchId: appointment.branchId }
+        : {}),
+      action: `appointment.${action}`,
+      resource: "appointment",
+      resourceId: appointment.id,
+      metadata: {
+        previousStatus: result.rows[0].previous_status,
+        status: nextStatus,
+      },
+    });
+
+    await client.query("COMMIT");
+
+    return appointment;
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
+export async function confirmAppointment(
+  pool: Pool,
+  input: AppointmentLifecycleInput,
+): Promise<AppointmentRecord> {
+  return transitionAppointment(
+    pool,
+    input,
+    "confirm",
+    ["scheduled"],
+    "confirmed",
+  );
+}
+
+export async function completeAppointment(
+  pool: Pool,
+  input: AppointmentLifecycleInput,
+): Promise<AppointmentRecord> {
+  return transitionAppointment(
+    pool,
+    input,
+    "complete",
+    ["scheduled", "confirmed"],
+    "completed",
+  );
+}
+
+export async function cancelAppointment(
+  pool: Pool,
+  input: AppointmentLifecycleInput,
+): Promise<AppointmentRecord> {
+  return transitionAppointment(
+    pool,
+    input,
+    "cancel",
+    ["scheduled", "confirmed"],
+    "cancelled",
+  );
+}
+
+export async function markAppointmentNoShow(
+  pool: Pool,
+  input: AppointmentLifecycleInput,
+): Promise<AppointmentRecord> {
+  return transitionAppointment(
+    pool,
+    input,
+    "no_show",
+    ["scheduled", "confirmed"],
+    "no_show",
+  );
+}
+
+type RescheduleAppointmentInput = AppointmentLifecycleInput & {
+  startsAt: string;
+  endsAt: string;
+};
+
+export async function rescheduleAppointment(
+  pool: Pool,
+  input: RescheduleAppointmentInput,
+): Promise<AppointmentRecord> {
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    const result = await client.query(
+      `
+        WITH current_appointment AS (
+          SELECT
+            id,
+            status AS previous_status,
+            starts_at AS previous_starts_at,
+            ends_at AS previous_ends_at
+          FROM appointments
+          WHERE tenant_id = $1
+            AND id = $2
+            AND status = ANY($3::text[])
+            AND (
+              $6::uuid IS NULL
+              OR branch_id = $6
+            )
+          FOR UPDATE
+        ),
+        updated_appointment AS (
+          UPDATE appointments AS a
+          SET
+            starts_at = $4::timestamptz,
+            ends_at = $5::timestamptz
+          FROM current_appointment AS current
+          WHERE a.id = current.id
+            AND $4::timestamptz < $5::timestamptz
+          RETURNING
+            a.id,
+            a.tenant_id,
+            a.branch_id,
+            a.patient_id,
+            a.provider_id,
+            a.service_id,
+            a.resource_id,
+            a.appointment_type,
+            a.status,
+            a.starts_at,
+            a.ends_at,
+            a.notes,
+            a.created_at
+        )
+        SELECT
+          updated_appointment.*,
+          current_appointment.previous_status,
+          current_appointment.previous_starts_at,
+          current_appointment.previous_ends_at
+        FROM updated_appointment
+        JOIN current_appointment
+          ON current_appointment.id = updated_appointment.id
+      `,
+      [
+        input.tenantId,
+        input.id,
+        ["scheduled", "confirmed"],
+        input.startsAt,
+        input.endsAt,
+        input.branchId ?? null,
+      ],
+    );
+
+    if (result.rowCount !== 1) {
+      throw new Error("appointment_reschedule_not_allowed");
+    }
+
+    const appointment = mapAppointment(result.rows[0]);
+
+    await createAuditEvent(client, {
+      id: randomUUID(),
+      tenantId: input.tenantId,
+      userId: input.actorUserId,
+      ...(appointment.branchId
+        ? { branchId: appointment.branchId }
+        : {}),
+      action: "appointment.rescheduled",
+      resource: "appointment",
+      resourceId: appointment.id,
+      metadata: {
+        previousStatus: result.rows[0].previous_status,
+        previousStartsAt: result.rows[0].previous_starts_at,
+        previousEndsAt: result.rows[0].previous_ends_at,
+        startsAt: appointment.startsAt,
+        endsAt: appointment.endsAt,
+      },
+    });
+
+    await client.query("COMMIT");
+
+    return appointment;
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+}

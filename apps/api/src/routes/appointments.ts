@@ -3,8 +3,13 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Pool } from "pg";
 
 import {
+  cancelAppointment,
+  completeAppointment,
+  confirmAppointment,
   createAppointment,
   findAppointments,
+  markAppointmentNoShow,
+  rescheduleAppointment,
 } from "@clinicos/db/appointments";
 import type {
   AppointmentStatus,
@@ -341,6 +346,252 @@ export async function handleCreateAppointment(
         404,
         "not_found",
         "One or more appointment references were not found in this tenant.",
+      );
+    }
+
+    throw error;
+  }
+}
+
+function appointmentIdFromPath(
+  request: IncomingMessage,
+): string {
+  const pathname = new URL(
+    request.url ?? "/",
+    "http://localhost",
+  ).pathname;
+
+  const match = pathname.match(
+    /^\/api\/v1\/appointments\/([^/]+)\/(?:confirm|complete|cancel|no-show|reschedule)$/,
+  );
+
+  if (!match?.[1]) {
+    throw new ApiError(
+      400,
+      "bad_request",
+      "A valid appointment id is required.",
+    );
+  }
+
+  return match[1];
+}
+
+async function handleAppointmentTransition(
+  request: IncomingMessage,
+  response: ServerResponse,
+  pool: Pool,
+  context: RequestContext,
+  action:
+    | "confirm"
+    | "complete"
+    | "cancel"
+    | "no_show",
+): Promise<void> {
+  requirePermission(context, "appointment:manage");
+
+  const authenticatedUser = requireContextUser(context);
+  const id = appointmentIdFromPath(request);
+  const branchId = authenticatedUser.context.branchId;
+
+  try {
+    let appointment;
+
+    if (action === "confirm") {
+      appointment = await confirmAppointment(pool, {
+        id,
+        tenantId: authenticatedUser.identity.tenantId,
+        actorUserId: authenticatedUser.identity.userId,
+        ...(branchId ? { branchId } : {}),
+      });
+    } else if (action === "complete") {
+      appointment = await completeAppointment(pool, {
+        id,
+        tenantId: authenticatedUser.identity.tenantId,
+        actorUserId: authenticatedUser.identity.userId,
+        ...(branchId ? { branchId } : {}),
+      });
+    } else if (action === "cancel") {
+      appointment = await cancelAppointment(pool, {
+        id,
+        tenantId: authenticatedUser.identity.tenantId,
+        actorUserId: authenticatedUser.identity.userId,
+        ...(branchId ? { branchId } : {}),
+      });
+    } else {
+      appointment = await markAppointmentNoShow(pool, {
+        id,
+        tenantId: authenticatedUser.identity.tenantId,
+        actorUserId: authenticatedUser.identity.userId,
+        ...(branchId ? { branchId } : {}),
+      });
+    }
+
+    sendJson(
+      response,
+      200,
+      { appointment },
+      context.requestId,
+      context.correlationId,
+    );
+  } catch (error) {
+    const message =
+      typeof error === "object" &&
+      error !== null &&
+      "message" in error
+        ? error.message
+        : undefined;
+
+    if (
+      message === "appointment_transition_not_allowed:confirm" ||
+      message === "appointment_transition_not_allowed:complete" ||
+      message === "appointment_transition_not_allowed:cancel" ||
+      message === "appointment_transition_not_allowed:no_show"
+    ) {
+      throw new ApiError(
+        409,
+        "conflict",
+        "The appointment cannot transition from its current state.",
+      );
+    }
+
+    throw error;
+  }
+}
+
+export async function handleConfirmAppointment(
+  request: IncomingMessage,
+  response: ServerResponse,
+  pool: Pool,
+  context: RequestContext,
+): Promise<void> {
+  await handleAppointmentTransition(
+    request,
+    response,
+    pool,
+    context,
+    "confirm",
+  );
+}
+
+export async function handleCompleteAppointment(
+  request: IncomingMessage,
+  response: ServerResponse,
+  pool: Pool,
+  context: RequestContext,
+): Promise<void> {
+  await handleAppointmentTransition(
+    request,
+    response,
+    pool,
+    context,
+    "complete",
+  );
+}
+
+export async function handleCancelAppointment(
+  request: IncomingMessage,
+  response: ServerResponse,
+  pool: Pool,
+  context: RequestContext,
+): Promise<void> {
+  await handleAppointmentTransition(
+    request,
+    response,
+    pool,
+    context,
+    "cancel",
+  );
+}
+
+export async function handleNoShowAppointment(
+  request: IncomingMessage,
+  response: ServerResponse,
+  pool: Pool,
+  context: RequestContext,
+): Promise<void> {
+  await handleAppointmentTransition(
+    request,
+    response,
+    pool,
+    context,
+    "no_show",
+  );
+}
+
+export async function handleRescheduleAppointment(
+  request: IncomingMessage,
+  response: ServerResponse,
+  pool: Pool,
+  context: RequestContext,
+): Promise<void> {
+  requirePermission(context, "appointment:manage");
+
+  const authenticatedUser = requireContextUser(context);
+  const id = appointmentIdFromPath(request);
+  const body = parseBody(await readBody(request));
+
+  if (!body.startsAt || !body.endsAt) {
+    throw new ApiError(
+      400,
+      "bad_request",
+      "startsAt and endsAt are required.",
+    );
+  }
+
+  const startsAt = new Date(body.startsAt);
+  const endsAt = new Date(body.endsAt);
+
+  if (
+    Number.isNaN(startsAt.getTime()) ||
+    Number.isNaN(endsAt.getTime())
+  ) {
+    throw new ApiError(
+      400,
+      "bad_request",
+      "startsAt and endsAt must be valid timestamps.",
+    );
+  }
+
+  if (startsAt >= endsAt) {
+    throw new ApiError(
+      400,
+      "bad_request",
+      "startsAt must be before endsAt.",
+    );
+  }
+
+  try {
+    const appointment = await rescheduleAppointment(pool, {
+      id,
+      tenantId: authenticatedUser.identity.tenantId,
+      actorUserId: authenticatedUser.identity.userId,
+      ...(authenticatedUser.context.branchId
+        ? { branchId: authenticatedUser.context.branchId }
+        : {}),
+      startsAt: startsAt.toISOString(),
+      endsAt: endsAt.toISOString(),
+    });
+
+    sendJson(
+      response,
+      200,
+      { appointment },
+      context.requestId,
+      context.correlationId,
+    );
+  } catch (error) {
+    const message =
+      typeof error === "object" &&
+      error !== null &&
+      "message" in error
+        ? error.message
+        : undefined;
+
+    if (message === "appointment_reschedule_not_allowed") {
+      throw new ApiError(
+        409,
+        "conflict",
+        "The appointment cannot be rescheduled from its current state.",
       );
     }
 

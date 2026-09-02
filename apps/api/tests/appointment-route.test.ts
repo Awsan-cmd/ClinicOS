@@ -833,4 +833,629 @@ describe("Appointment API security boundary", () => {
       await stopServer(server);
     }
   });
+
+  it("confirms a scheduled appointment and audits the authenticated actor", async () => {
+    const pool = createAuthenticatedPool("admin");
+
+    pool.client.query
+      .mockResolvedValueOnce({
+        rowCount: null,
+        rows: [],
+      })
+      // transition query
+      .mockResolvedValueOnce({
+        rowCount: 1,
+        rows: [
+          {
+            id: "appointment-1",
+            tenant_id: "tenant-1",
+            branch_id: "branch-1",
+            patient_id: "patient-1",
+            provider_id: "provider-1",
+            service_id: "service-1",
+            resource_id: null,
+            appointment_type: "standard",
+            status: "confirmed",
+            starts_at: new Date("2026-09-02T10:00:00.000Z"),
+            ends_at: new Date("2026-09-02T10:30:00.000Z"),
+            notes: null,
+            created_at: new Date("2026-09-01T12:00:00.000Z"),
+            previous_status: "scheduled",
+          },
+        ],
+      })
+      // audit insert
+      .mockResolvedValueOnce({
+        rowCount: 1,
+        rows: [],
+      })
+      // COMMIT
+      .mockResolvedValueOnce({
+        rowCount: null,
+        rows: [],
+      });
+
+    const { server, url } = await startServer(pool);
+
+    try {
+      const response = await fetch(
+        `${url}/api/v1/appointments/appointment-1/confirm`,
+        {
+          method: "POST",
+          headers: {
+            authorization: "Bearer test-session-token",
+          },
+        },
+      );
+
+      expect(response.status).toBe(200);
+
+      await expect(response.json()).resolves.toMatchObject({
+        data: {
+          appointment: {
+            id: "appointment-1",
+            status: "confirmed",
+          },
+        },
+      });
+
+      const transitionCall = pool.client.query.mock.calls[1]!;
+      expect(transitionCall[0]).toContain(
+        "WHERE tenant_id = $1",
+      );
+      expect(transitionCall[0]).toContain(
+        "status = ANY($3::text[])",
+      );
+      expect(transitionCall[1]).toEqual([
+        "tenant-1",
+        "appointment-1",
+        ["scheduled"],
+        "confirmed",
+        "branch-1",
+      ]);
+
+      const auditCall = pool.client.query.mock.calls[2]!;
+      expect(auditCall[0]).toContain(
+        "INSERT INTO audit_events",
+      );
+      expect(auditCall[1]).toEqual(
+        expect.arrayContaining([
+          "tenant-1",
+          "actor-1",
+          "branch-1",
+          "appointment.confirm",
+          "appointment",
+          "appointment-1",
+        ]),
+      );
+    } finally {
+      await stopServer(server);
+    }
+  });
+
+  it("rejects lifecycle mutations without appointment:manage", async () => {
+    const pool = createAuthenticatedPool("nurse");
+
+    const { server, url } = await startServer(pool);
+
+    try {
+      const response = await fetch(
+        `${url}/api/v1/appointments/appointment-1/confirm`,
+        {
+          method: "POST",
+          headers: {
+            authorization: "Bearer test-session-token",
+          },
+        },
+      );
+
+      expect(response.status).toBe(403);
+
+      await expect(response.json()).resolves.toMatchObject({
+        data: {
+          error: {
+            code: "forbidden",
+          },
+        },
+      });
+
+      expect(pool.connect).not.toHaveBeenCalled();
+    } finally {
+      await stopServer(server);
+    }
+  });
+
+  it("maps a disallowed appointment transition to conflict", async () => {
+    const pool = createAuthenticatedPool("admin");
+
+    pool.client.query
+      .mockResolvedValueOnce({
+        rowCount: null,
+        rows: [],
+      })
+      .mockResolvedValueOnce({
+        rowCount: 0,
+        rows: [],
+      })
+      // ROLLBACK
+      .mockResolvedValueOnce({
+        rowCount: null,
+        rows: [],
+      });
+
+    const { server, url } = await startServer(pool);
+
+    try {
+      const response = await fetch(
+        `${url}/api/v1/appointments/appointment-1/confirm`,
+        {
+          method: "POST",
+          headers: {
+            authorization: "Bearer test-session-token",
+          },
+        },
+      );
+
+      expect(response.status).toBe(409);
+
+      await expect(response.json()).resolves.toMatchObject({
+        data: {
+          error: {
+            code: "conflict",
+          },
+        },
+      });
+    } finally {
+      await stopServer(server);
+    }
+  });
+
+  it("reschedules a scheduled appointment without changing its status", async () => {
+    const pool = createAuthenticatedPool("admin");
+
+    pool.client.query
+      .mockResolvedValueOnce({
+        rowCount: null,
+        rows: [],
+      })
+      .mockResolvedValueOnce({
+        rowCount: 1,
+        rows: [
+          {
+            id: "appointment-1",
+            tenant_id: "tenant-1",
+            branch_id: "branch-1",
+            patient_id: "patient-1",
+            provider_id: "provider-1",
+            service_id: "service-1",
+            resource_id: "resource-1",
+            appointment_type: "consultation",
+            status: "scheduled",
+            starts_at: new Date("2026-09-03T11:00:00.000Z"),
+            ends_at: new Date("2026-09-03T11:30:00.000Z"),
+            notes: "follow-up",
+            created_at: new Date("2026-09-01T12:00:00.000Z"),
+            previous_status: "scheduled",
+            previous_starts_at: new Date("2026-09-02T10:00:00.000Z"),
+            previous_ends_at: new Date("2026-09-02T10:30:00.000Z"),
+          },
+        ],
+      })
+      // audit insert
+      .mockResolvedValueOnce({
+        rowCount: 1,
+        rows: [],
+      })
+      // COMMIT
+      .mockResolvedValueOnce({
+        rowCount: null,
+        rows: [],
+      });
+
+    const { server, url } = await startServer(pool);
+
+    try {
+      const response = await fetch(
+        `${url}/api/v1/appointments/appointment-1/reschedule`,
+        {
+          method: "POST",
+          headers: {
+            authorization: "Bearer test-session-token",
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            startsAt: "2026-09-03T11:00:00.000Z",
+            endsAt: "2026-09-03T11:30:00.000Z",
+          }),
+        },
+      );
+
+      expect(response.status).toBe(200);
+
+      await expect(response.json()).resolves.toMatchObject({
+        data: {
+          appointment: {
+            id: "appointment-1",
+            status: "scheduled",
+            startsAt: "2026-09-03T11:00:00.000Z",
+            endsAt: "2026-09-03T11:30:00.000Z",
+            patientId: "patient-1",
+            providerId: "provider-1",
+            serviceId: "service-1",
+            resourceId: "resource-1",
+          },
+        },
+      });
+
+      const rescheduleCall = pool.client.query.mock.calls[1]!;
+      expect(rescheduleCall[0]).toContain(
+        "starts_at = $4::timestamptz",
+      );
+      expect(rescheduleCall[0]).toContain(
+        "ends_at = $5::timestamptz",
+      );
+      expect(rescheduleCall[1]).toEqual([
+        "tenant-1",
+        "appointment-1",
+        ["scheduled", "confirmed"],
+        "2026-09-03T11:00:00.000Z",
+        "2026-09-03T11:30:00.000Z",
+        "branch-1",
+      ]);
+
+      const auditCall = pool.client.query.mock.calls[2]!;
+      expect(auditCall[0]).toContain(
+        "INSERT INTO audit_events",
+      );
+      expect(auditCall[1]).toEqual(
+        expect.arrayContaining([
+          "tenant-1",
+          "actor-1",
+          "branch-1",
+          "appointment.rescheduled",
+          "appointment",
+          "appointment-1",
+        ]),
+      );
+    } finally {
+      await stopServer(server);
+    }
+  });
+
+  it("rejects rescheduling when the new start is not before the new end", async () => {
+    const pool = createAuthenticatedPool("admin");
+
+    const { server, url } = await startServer(pool);
+
+    try {
+      const response = await fetch(
+        `${url}/api/v1/appointments/appointment-1/reschedule`,
+        {
+          method: "POST",
+          headers: {
+            authorization: "Bearer test-session-token",
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            startsAt: "2026-09-03T12:00:00.000Z",
+            endsAt: "2026-09-03T11:00:00.000Z",
+          }),
+        },
+      );
+
+      expect(response.status).toBe(400);
+
+      await expect(response.json()).resolves.toMatchObject({
+        data: {
+          error: {
+            code: "bad_request",
+          },
+        },
+      });
+
+      expect(pool.connect).not.toHaveBeenCalled();
+    } finally {
+      await stopServer(server);
+    }
+  });
+
+  it("maps a disallowed reschedule to conflict", async () => {
+    const pool = createAuthenticatedPool("admin");
+
+    pool.client.query
+      .mockResolvedValueOnce({
+        rowCount: null,
+        rows: [],
+      })
+      .mockResolvedValueOnce({
+        rowCount: 0,
+        rows: [],
+      })
+      // ROLLBACK
+      .mockResolvedValueOnce({
+        rowCount: null,
+        rows: [],
+      });
+
+    const { server, url } = await startServer(pool);
+
+    try {
+      const response = await fetch(
+        `${url}/api/v1/appointments/appointment-1/reschedule`,
+        {
+          method: "POST",
+          headers: {
+            authorization: "Bearer test-session-token",
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            startsAt: "2026-09-03T12:00:00.000Z",
+            endsAt: "2026-09-03T12:30:00.000Z",
+          }),
+        },
+      );
+
+      expect(response.status).toBe(409);
+
+      await expect(response.json()).resolves.toMatchObject({
+        data: {
+          error: {
+            code: "conflict",
+          },
+        },
+      });
+    } finally {
+      await stopServer(server);
+    }
+  });
+
+  it("rejects lifecycle access outside the authenticated branch", async () => {
+    const pool = createAuthenticatedPool("admin");
+
+    pool.client.query
+      .mockResolvedValueOnce({
+        rowCount: null,
+        rows: [],
+      })
+      .mockResolvedValueOnce({
+        rowCount: 0,
+        rows: [],
+      })
+      // ROLLBACK
+      .mockResolvedValueOnce({
+        rowCount: null,
+        rows: [],
+      });
+
+    const { server, url } = await startServer(pool);
+
+    try {
+      const response = await fetch(
+        `${url}/api/v1/appointments/appointment-1/cancel`,
+        {
+          method: "POST",
+          headers: {
+            authorization: "Bearer test-session-token",
+          },
+        },
+      );
+
+      expect(response.status).toBe(409);
+
+      await expect(response.json()).resolves.toMatchObject({
+        data: {
+          error: {
+            code: "conflict",
+          },
+        },
+      });
+
+      const transitionCall = pool.client.query.mock.calls[1]!;
+      expect(transitionCall[0]).toContain(
+        "branch_id = $5",
+      );
+      expect(transitionCall[1]![4]).toBe("branch-1");
+    } finally {
+      await stopServer(server);
+    }
+  });
+
+  it("cancels a scheduled appointment", async () => {
+    const pool = createAuthenticatedPool("admin");
+
+    pool.client.query
+      .mockResolvedValueOnce({
+        rowCount: null,
+        rows: [],
+      })
+      .mockResolvedValueOnce({
+        rowCount: 1,
+        rows: [
+          {
+            id: "appointment-1",
+            tenant_id: "tenant-1",
+            branch_id: "branch-1",
+            patient_id: "patient-1",
+            provider_id: "provider-1",
+            service_id: "service-1",
+            resource_id: null,
+            appointment_type: "standard",
+            status: "cancelled",
+            starts_at: new Date("2026-09-02T10:00:00.000Z"),
+            ends_at: new Date("2026-09-02T10:30:00.000Z"),
+            notes: null,
+            created_at: new Date("2026-09-01T12:00:00.000Z"),
+            previous_status: "scheduled",
+          },
+        ],
+      })
+      .mockResolvedValueOnce({
+        rowCount: 1,
+        rows: [],
+      })
+      .mockResolvedValueOnce({
+        rowCount: null,
+        rows: [],
+      });
+
+    const { server, url } = await startServer(pool);
+
+    try {
+      const response = await fetch(
+        `${url}/api/v1/appointments/appointment-1/cancel`,
+        {
+          method: "POST",
+          headers: {
+            authorization: "Bearer test-session-token",
+          },
+        },
+      );
+
+      expect(response.status).toBe(200);
+
+      await expect(response.json()).resolves.toMatchObject({
+        data: {
+          appointment: {
+            id: "appointment-1",
+            status: "cancelled",
+          },
+        },
+      });
+    } finally {
+      await stopServer(server);
+    }
+  });
+
+  it("marks a scheduled appointment as no-show", async () => {
+    const pool = createAuthenticatedPool("admin");
+
+    pool.client.query
+      .mockResolvedValueOnce({
+        rowCount: null,
+        rows: [],
+      })
+      .mockResolvedValueOnce({
+        rowCount: 1,
+        rows: [
+          {
+            id: "appointment-1",
+            tenant_id: "tenant-1",
+            branch_id: "branch-1",
+            patient_id: "patient-1",
+            provider_id: "provider-1",
+            service_id: "service-1",
+            resource_id: null,
+            appointment_type: "standard",
+            status: "no_show",
+            starts_at: new Date("2026-09-02T10:00:00.000Z"),
+            ends_at: new Date("2026-09-02T10:30:00.000Z"),
+            notes: null,
+            created_at: new Date("2026-09-01T12:00:00.000Z"),
+            previous_status: "scheduled",
+          },
+        ],
+      })
+      .mockResolvedValueOnce({
+        rowCount: 1,
+        rows: [],
+      })
+      .mockResolvedValueOnce({
+        rowCount: null,
+        rows: [],
+      });
+
+    const { server, url } = await startServer(pool);
+
+    try {
+      const response = await fetch(
+        `${url}/api/v1/appointments/appointment-1/no-show`,
+        {
+          method: "POST",
+          headers: {
+            authorization: "Bearer test-session-token",
+          },
+        },
+      );
+
+      expect(response.status).toBe(200);
+
+      await expect(response.json()).resolves.toMatchObject({
+        data: {
+          appointment: {
+            id: "appointment-1",
+            status: "no_show",
+          },
+        },
+      });
+    } finally {
+      await stopServer(server);
+    }
+  });
+
+  it("supports completing a scheduled appointment directly", async () => {
+    const pool = createAuthenticatedPool("admin");
+
+    pool.client.query
+      .mockResolvedValueOnce({
+        rowCount: null,
+        rows: [],
+      })
+      .mockResolvedValueOnce({
+        rowCount: 1,
+        rows: [
+          {
+            id: "appointment-1",
+            tenant_id: "tenant-1",
+            branch_id: "branch-1",
+            patient_id: "patient-1",
+            provider_id: "provider-1",
+            service_id: "service-1",
+            resource_id: null,
+            appointment_type: "standard",
+            status: "completed",
+            starts_at: new Date("2026-09-02T10:00:00.000Z"),
+            ends_at: new Date("2026-09-02T10:30:00.000Z"),
+            notes: null,
+            created_at: new Date("2026-09-01T12:00:00.000Z"),
+            previous_status: "scheduled",
+          },
+        ],
+      })
+      .mockResolvedValueOnce({
+        rowCount: 1,
+        rows: [],
+      })
+      .mockResolvedValueOnce({
+        rowCount: null,
+        rows: [],
+      });
+
+    const { server, url } = await startServer(pool);
+
+    try {
+      const response = await fetch(
+        `${url}/api/v1/appointments/appointment-1/complete`,
+        {
+          method: "POST",
+          headers: {
+            authorization: "Bearer test-session-token",
+          },
+        },
+      );
+
+      expect(response.status).toBe(200);
+
+      await expect(response.json()).resolves.toMatchObject({
+        data: {
+          appointment: {
+            id: "appointment-1",
+            status: "completed",
+          },
+        },
+      });
+    } finally {
+      await stopServer(server);
+    }
+  });
+
 });

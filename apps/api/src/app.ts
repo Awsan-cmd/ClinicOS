@@ -25,7 +25,12 @@ import {
 } from "./routes/services.js";
 import {
   handleAppointments,
+  handleCancelAppointment,
+  handleCompleteAppointment,
+  handleConfirmAppointment,
   handleCreateAppointment,
+  handleNoShowAppointment,
+  handleRescheduleAppointment,
 } from "./routes/appointments.js";
 import {
   handleCreateResource,
@@ -210,6 +215,67 @@ async function route(
     );
 
     await handleCreateAppointment(
+      request,
+      response,
+      pool,
+      context,
+    );
+    return;
+  }
+
+  if (
+    method === "POST" &&
+    url.pathname.match(
+      /^\/api\/v1\/appointments\/[^/]+\/(?:confirm|complete|cancel|no-show|reschedule)$/,
+    )
+  ) {
+    await requireAuthenticatedRequest(
+      pool,
+      request.headers,
+      context,
+    );
+
+    if (url.pathname.endsWith("/confirm")) {
+      await handleConfirmAppointment(
+        request,
+        response,
+        pool,
+        context,
+      );
+      return;
+    }
+
+    if (url.pathname.endsWith("/complete")) {
+      await handleCompleteAppointment(
+        request,
+        response,
+        pool,
+        context,
+      );
+      return;
+    }
+
+    if (url.pathname.endsWith("/cancel")) {
+      await handleCancelAppointment(
+        request,
+        response,
+        pool,
+        context,
+      );
+      return;
+    }
+
+    if (url.pathname.endsWith("/no-show")) {
+      await handleNoShowAppointment(
+        request,
+        response,
+        pool,
+        context,
+      );
+      return;
+    }
+
+    await handleRescheduleAppointment(
       request,
       response,
       pool,
