@@ -546,3 +546,27 @@ Phase 2F is limited to Appointment Foundation. Conflict detection, reschedule, c
 - Fresh PostgreSQL migration runtime verification completed successfully after installing PostgreSQL 18.6 locally: all migrations `0001_initial_tenancy` through `0016_booking_rules` applied successfully with `runMigrations()` against the `clinicos` database on port `5433`; 16 applied, 0 skipped.
 - Out of scope for Phase 2J: slot calculation, conflict detection, booking engine, waitlist, recurring appointments, online booking, notifications, calendar UI, and applying booking rules to appointment lifecycle operations.
 - Phase 2J functional implementation and documentation are complete; PostgreSQL migration runtime verification is confirmed.
+
+## 2026-09-02 — Phase 2K Appointment Conflict Prevention
+
+- Added PostgreSQL-backed conflict prevention for appointments.
+- Provider overlap is prevented for appointments in `scheduled` or `confirmed` status.
+- Resource overlap is prevented for appointments in `scheduled` or `confirmed` status when a resource is assigned.
+- Overlap uses half-open time ranges, so adjacent appointments are allowed.
+- `completed`, `cancelled`, and `no_show` appointments do not reserve provider or resource time.
+- Conflict prevention is tenant-scoped at the database layer.
+- PostgreSQL `EXCLUDE USING gist` constraints provide concurrency-safe enforcement rather than relying on application-level check-then-insert logic.
+- `btree_gist` is installed and used by the conflict migration.
+- Appointment creation and reschedule operations map PostgreSQL exclusion violations (`23P01`) to the API response `409 conflict`.
+- Added API regression coverage for create and reschedule conflict mapping.
+- Targeted appointment route suite: 29 tests passed.
+- Full Vitest suite: 28 test files / 231 tests passed.
+- Workspace TypeScript typecheck passed.
+- Workspace ESLint passed.
+- `git diff --check` passed.
+- Fresh PostgreSQL migration runtime verification completed successfully: all migrations `0001_initial_tenancy` through `0017_appointment_conflicts` applied to a fresh `clinicos_phase2k_fresh` database; 17 applied, 0 skipped.
+- Direct PostgreSQL verification confirmed provider overlap rejection, adjacent appointment allowance, inactive conflict status allowance, and cross-tenant coexistence; the migration defines separate provider and resource exclusion constraints.
+- The repository does not currently define an `npm run diff-check` script; the attempted command therefore returned `Missing script: "diff-check"` and was not treated as a code validation failure.
+- Out of scope for Phase 2K: slot calculation, working-hours enforcement, break/holiday enforcement, booking-rule evaluation, waitlist, recurring appointments, online booking, notifications, calendar UI, patient double-booking rules, buffer time, and overbooking exceptions.
+- Appointment lifecycle transitions remain unchanged; conflict prevention applies only to appointment creation and reschedule.
+- Phase 2K conflict prevention implementation and PostgreSQL migration verification are complete.

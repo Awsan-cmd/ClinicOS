@@ -607,3 +607,19 @@ Booking rules reference the Phase 2I appointment type catalog through a tenant-a
 Rule thresholds are constrained to non-negative values for advance booking days and minimum notice minutes. All referenced records must belong to the same tenant, and branch-context users remain restricted to their authenticated branch.
 
 Phase 2J establishes the booking-rule foundation only. Rule evaluation, slot calculation, conflict prevention, booking execution, waitlist behavior, recurring appointments, online booking, notifications, and appointment lifecycle integration remain later scheduling concerns.
+
+### 060 — Appointment Time Conflicts Are Database-Enforced
+
+ClinicOS prevents overlapping appointments at the PostgreSQL database layer.
+
+For appointments in `scheduled` or `confirmed` status:
+
+- a provider cannot have overlapping appointments within the same tenant;
+- a non-null resource cannot have overlapping appointments within the same tenant;
+- adjacent appointments are allowed through half-open `[)` time ranges.
+
+PostgreSQL exclusion constraints using `btree_gist` provide the concurrency-safe invariant. Application code maps PostgreSQL exclusion violations to the domain error `appointment_conflict`, which the API exposes as `409 conflict`.
+
+Terminal appointment states (`completed`, `cancelled`, and `no_show`) do not reserve provider or resource time.
+
+Phase 2K does not apply booking-rule evaluation, working-hours/break/holiday enforcement, patient double-booking rules, buffer time, overbooking exceptions, or conflict checks to appointment lifecycle transitions other than reschedule.

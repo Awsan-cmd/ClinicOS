@@ -1159,6 +1159,130 @@ describe("Appointment API security boundary", () => {
     }
   });
 
+  it("maps appointment creation conflicts to conflict", async () => {
+    const pool = createAuthenticatedPool("admin");
+
+    pool.client.query
+      .mockResolvedValueOnce({
+        rowCount: null,
+        rows: [],
+      })
+      // branch belongs to tenant
+      .mockResolvedValueOnce({
+        rowCount: 1,
+        rows: [{ id: "branch-1" }],
+      })
+      // patient belongs to tenant
+      .mockResolvedValueOnce({
+        rowCount: 1,
+        rows: [{ id: "patient-1" }],
+      })
+      // provider belongs to tenant
+      .mockResolvedValueOnce({
+        rowCount: 1,
+        rows: [{ id: "provider-1" }],
+      })
+      // service belongs to tenant
+      .mockResolvedValueOnce({
+        rowCount: 1,
+        rows: [{ id: "service-1" }],
+      })
+      // PostgreSQL exclusion constraint
+      .mockRejectedValueOnce(
+        Object.assign(
+          new Error("conflicting key value violates exclusion constraint"),
+          { code: "23P01" },
+        ),
+      )
+      // ROLLBACK
+      .mockResolvedValueOnce({
+        rowCount: null,
+        rows: [],
+      });
+
+    const { server, url } = await startServer(pool);
+
+    try {
+      const response = await fetch(`${url}/api/v1/appointments`, {
+        method: "POST",
+        headers: {
+          authorization: "Bearer test-session-token",
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(validAppointment),
+      });
+
+      expect(response.status).toBe(409);
+
+      await expect(response.json()).resolves.toMatchObject({
+        data: {
+          error: {
+            code: "conflict",
+          },
+        },
+      });
+
+      expect(pool.client.query).toHaveBeenCalledTimes(7);
+    } finally {
+      await stopServer(server);
+    }
+  });
+
+  it("maps appointment reschedule conflicts to conflict", async () => {
+    const pool = createAuthenticatedPool("admin");
+
+    pool.client.query
+      .mockResolvedValueOnce({
+        rowCount: null,
+        rows: [],
+      })
+      // PostgreSQL exclusion constraint during UPDATE
+      .mockRejectedValueOnce(
+        Object.assign(
+          new Error("conflicting key value violates exclusion constraint"),
+          { code: "23P01" },
+        ),
+      )
+      // ROLLBACK
+      .mockResolvedValueOnce({
+        rowCount: null,
+        rows: [],
+      });
+
+    const { server, url } = await startServer(pool);
+
+    try {
+      const response = await fetch(
+        `${url}/api/v1/appointments/appointment-1/reschedule`,
+        {
+          method: "POST",
+          headers: {
+            authorization: "Bearer test-session-token",
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            startsAt: "2026-09-03T10:30:00.000Z",
+            endsAt: "2026-09-03T11:30:00.000Z",
+          }),
+        },
+      );
+
+      expect(response.status).toBe(409);
+
+      await expect(response.json()).resolves.toMatchObject({
+        data: {
+          error: {
+            code: "conflict",
+          },
+        },
+      });
+
+      expect(pool.client.query).toHaveBeenCalledTimes(3);
+    } finally {
+      await stopServer(server);
+    }
+  });
+
   it("maps a disallowed reschedule to conflict", async () => {
     const pool = createAuthenticatedPool("admin");
 

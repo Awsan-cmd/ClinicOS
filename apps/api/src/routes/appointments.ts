@@ -335,6 +335,14 @@ export async function handleCreateAppointment(
         ? error.message
         : undefined;
 
+    if (message === "appointment_conflict") {
+      throw new ApiError(
+        409,
+        "conflict",
+        "The appointment time conflicts with an existing appointment.",
+      );
+    }
+
     if (
       message === "appointment_branch_not_found" ||
       message === "appointment_patient_not_found" ||
@@ -586,6 +594,14 @@ export async function handleRescheduleAppointment(
       "message" in error
         ? error.message
         : undefined;
+
+    if (message === "appointment_conflict") {
+      throw new ApiError(
+        409,
+        "conflict",
+        "The appointment time conflicts with an existing appointment.",
+      );
+    }
 
     if (message === "appointment_reschedule_not_allowed") {
       throw new ApiError(

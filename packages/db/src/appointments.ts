@@ -272,6 +272,16 @@ export async function createAppointment(
     return appointment;
   } catch (error) {
     await client.query("ROLLBACK");
+
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === "23P01"
+    ) {
+      throw new Error("appointment_conflict", { cause: error });
+    }
+
     throw error;
   } finally {
     client.release();
@@ -546,6 +556,16 @@ export async function rescheduleAppointment(
     return appointment;
   } catch (error) {
     await client.query("ROLLBACK");
+
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === "23P01"
+    ) {
+      throw new Error("appointment_conflict", { cause: error });
+    }
+
     throw error;
   } finally {
     client.release();
