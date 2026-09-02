@@ -24,6 +24,10 @@ import {
   handleServices,
 } from "./routes/services.js";
 import {
+  handleCreateAppointmentType,
+  handleAppointmentTypes,
+} from "./routes/appointment-types.js";
+import {
   handleAppointments,
   handleCancelAppointment,
   handleCompleteAppointment,
@@ -284,6 +288,44 @@ async function route(
     }
 
     await handleRescheduleAppointment(
+      request,
+      response,
+      pool,
+      context,
+    );
+    return;
+  }
+
+  if (
+    method === "GET" &&
+    url.pathname === "/api/v1/appointment-types"
+  ) {
+    await requireAuthenticatedRequest(
+      pool,
+      request.headers,
+      context,
+    );
+
+    await handleAppointmentTypes(
+      request,
+      response,
+      pool,
+      context,
+    );
+    return;
+  }
+
+  if (
+    method === "POST" &&
+    url.pathname === "/api/v1/appointment-types"
+  ) {
+    await requireAuthenticatedRequest(
+      pool,
+      request.headers,
+      context,
+    );
+
+    await handleCreateAppointmentType(
       request,
       response,
       pool,

@@ -27,6 +27,8 @@ export type Permission =
   | "patient:manage"
   | "appointment:read"
   | "appointment:manage"
+  | "appointment_type:read"
+  | "appointment_type:manage"
   | "clinical:read"
   | "clinical:manage"
   | "billing:read"
@@ -65,6 +67,8 @@ export const ROLE_PERMISSIONS: Readonly<
     "patient:manage",
     "appointment:read",
     "appointment:manage",
+    "appointment_type:read",
+    "appointment_type:manage",
     "clinical:read",
     "clinical:manage",
     "billing:read",
@@ -99,6 +103,8 @@ export const ROLE_PERMISSIONS: Readonly<
     "patient:manage",
     "appointment:read",
     "appointment:manage",
+    "appointment_type:read",
+    "appointment_type:manage",
     "clinical:read",
     "clinical:manage",
     "billing:read",
@@ -130,6 +136,8 @@ export const ROLE_PERMISSIONS: Readonly<
     "patient:manage",
     "appointment:read",
     "appointment:manage",
+    "appointment_type:read",
+    "appointment_type:manage",
     "clinical:read",
     "billing:read",
     "device:read",
@@ -148,6 +156,7 @@ export const ROLE_PERMISSIONS: Readonly<
     "patient:read",
     "patient:manage",
     "appointment:read",
+    "appointment_type:read",
     "appointment:manage",
     "clinical:read",
     "clinical:manage",
@@ -165,6 +174,7 @@ export const ROLE_PERMISSIONS: Readonly<
     "patient:read",
     "patient:manage",
     "appointment:read",
+    "appointment_type:read",
     "appointment:manage",
   ],
   nurse: [
@@ -180,6 +190,7 @@ export const ROLE_PERMISSIONS: Readonly<
     "patient:read",
     "patient:manage",
     "appointment:read",
+    "appointment_type:read",
     "clinical:read",
     "clinical:manage",
   ],

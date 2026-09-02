@@ -17,6 +17,7 @@
     "./service": "./src/service.ts",
     "./calendar": "./src/calendar.ts",
     "./schedule": "./src/schedule.ts",
-    "./appointment": "./src/appointment.ts"
+    "./appointment": "./src/appointment.ts",
+    "./appointment-type": "./src/appointment-type.ts"
   }
 }
