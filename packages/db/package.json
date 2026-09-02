@@ -19,7 +19,8 @@
     "./session-auth": "./src/session-auth.ts",
     "./patients": "./src/patients.ts",
     "./staff": "./src/staff.ts",
-    "./services": "./src/services.ts"
+    "./services": "./src/services.ts",
+    "./calendar": "./src/calendar.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

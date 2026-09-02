@@ -14,6 +14,7 @@
     "./device-session": "./src/device-session.ts",
     "./device-session-guard": "./src/device-session-guard.ts",
     "./staff": "./src/staff.ts",
-    "./service": "./src/service.ts"
+    "./service": "./src/service.ts",
+    "./calendar": "./src/calendar.ts"
   }
 }

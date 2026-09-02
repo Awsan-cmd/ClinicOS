@@ -24,6 +24,14 @@ import {
   handleServices,
 } from "./routes/services.js";
 import {
+  handleCreateResource,
+  handleResources,
+} from "./routes/resources.js";
+import {
+  handleAvailabilityRules,
+  handleCreateAvailabilityRule,
+} from "./routes/availability-rules.js";
+import {
   handleCreatePatient,
   handlePatients,
 } from "./routes/patient-access.js";
@@ -206,6 +214,82 @@ async function route(
     return;
   }
 
+
+  if (
+    method === "GET" &&
+    url.pathname === "/api/v1/resources"
+  ) {
+    await requireAuthenticatedRequest(
+      pool,
+      request.headers,
+      context,
+    );
+
+    await handleResources(
+      request,
+      response,
+      pool,
+      context,
+    );
+    return;
+  }
+
+  if (
+    method === "POST" &&
+    url.pathname === "/api/v1/resources"
+  ) {
+    await requireAuthenticatedRequest(
+      pool,
+      request.headers,
+      context,
+    );
+
+    await handleCreateResource(
+      request,
+      response,
+      pool,
+      context,
+    );
+    return;
+  }
+
+  if (
+    method === "GET" &&
+    url.pathname === "/api/v1/availability-rules"
+  ) {
+    await requireAuthenticatedRequest(
+      pool,
+      request.headers,
+      context,
+    );
+
+    await handleAvailabilityRules(
+      request,
+      response,
+      pool,
+      context,
+    );
+    return;
+  }
+
+  if (
+    method === "POST" &&
+    url.pathname === "/api/v1/availability-rules"
+  ) {
+    await requireAuthenticatedRequest(
+      pool,
+      request.headers,
+      context,
+    );
+
+    await handleCreateAvailabilityRule(
+      request,
+      response,
+      pool,
+      context,
+    );
+    return;
+  }
 
   if (
     method === "POST" &&

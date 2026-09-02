@@ -2,12 +2,12 @@
 
 ## Current Stage
 
-Phase 2C — Service Management.
+Phase 2E — Calendar Foundation.
 
 ## Verified Recovery Point
 
-- Latest verified functional commit: `88155c1` — `feat(api): implement phase2a staff management`.
-- Latest repository documentation commit: `ca5d32b` — `docs(ai): reconcile project memory with current state`.
+- Latest verified functional commit: `5a447e52d8253b6bde1734f41679d6d71179dc16` — `feat(api): complete phase2d patient management`.
+- Latest repository documentation commit: `18abbe3a3afb08e44251dbf6fbabaf7ed3c4b668` — `docs(ai): update phase2d recovery point`.
 - Phase 1 device-session enforcement and revocation foundations are implemented.
 - Required device-session enforcement helper is implemented.
 - Full test suite currently validates the Phase 1 platform foundation.
@@ -22,6 +22,7 @@ Phase 2C — Service Management.
 - Verified typecheck, lint, and test execution.
 - Phase 0 infrastructure foundation completed and pushed.
 - Phase 1 tenancy foundation completed and pushed.
+- Phase 2E Calendar Foundation implemented and validated locally; final commit and remote verification are pending.
 - Continuous documentation and recovery-point policy established.
 - Phase 1A database foundation completed and validated.
 - Phase 1B identity foundation implemented and validated.
@@ -199,7 +200,7 @@ Documentation is updated as part of the implementation workflow before significa
   - Workspace TypeScript typecheck passed.
   - Workspace ESLint passed.
   - `git diff --check` passed.
-- Calendar, Scheduling, and Appointment lifecycle remain the next Phase 2 domain slices.
+- Calendar Foundation is implemented and validated. Scheduling and Appointment lifecycle remain the next Phase 2 domain slices.
 
 
 ## 2026-09-01 — API Session Logout Lifecycle Hardening
@@ -363,6 +364,61 @@ Validation completed:
 - Lint passed.
 - `git diff --check` passed.
 
-Phase 2C remains limited to Service Catalog / Service Management. Calendar, Scheduling, Appointment lifecycle, Provider availability, pricing, billing integration, and service-to-provider scheduling remain outside the current implementation scope.
+Phase 2C remains limited to Service Catalog / Service Management.
 
-The Phase 2C recovery point will be established after final documentation review, commit, push, and remote verification.
+### Phase 2E — Calendar Foundation
+
+Calendar Foundation is implemented as the next Phase 2 domain slice.
+
+Implemented components:
+
+- `database/migrations/0012_calendar_foundation.sql`
+- `packages/types/src/calendar.ts`
+- `packages/types/src/permission.ts`
+- `packages/db/src/calendar.ts`
+- `apps/api/src/routes/resources.ts`
+- `apps/api/src/routes/availability-rules.ts`
+- `apps/api/tests/resource-route.test.ts`
+- `apps/api/tests/availability-rules-route.test.ts`
+
+API endpoints:
+
+- `GET /api/v1/resources`
+- `POST /api/v1/resources`
+- `GET /api/v1/availability-rules`
+- `POST /api/v1/availability-rules`
+
+Calendar Foundation guarantees:
+
+- Resources are tenant-scoped.
+- Resources may be branch-scoped.
+- Resource codes are unique within a tenant.
+- Resource types are restricted to `room`, `chair`, `equipment`, and `other`.
+- Resource creation inherits the authenticated branch when no branch is supplied.
+- Branch-context users cannot create or query resources outside their authenticated branch.
+- Availability rules are tenant-scoped.
+- Availability rules may be branch-scoped.
+- Availability rules must target a provider or resource.
+- Provider and resource references are tenant-aware at the database layer.
+- Availability rules enforce day-of-week and `HH:mm` time boundaries.
+- Resource and availability creation records the authenticated actor through audit events.
+
+Permissions:
+
+- `resource:read`
+- `resource:manage`
+- `availability:read`
+- `availability:manage`
+
+Validation completed:
+
+- Availability route tests: 11 tests passed.
+- Resource route tests: 10 tests passed.
+- Full test suite: 24 test files passed.
+- Full test suite: 157 tests passed.
+- Workspace TypeScript typecheck passed.
+- Workspace ESLint passed.
+- `git diff --check` passed.
+- Clean-database migration validation completed successfully through `0012_calendar_foundation.sql`.
+
+Phase 2E is limited to Calendar Foundation. Appointment creation, booking/conflict detection, reschedule/cancel/no-show lifecycle, recurring appointments, waitlist, online booking, and calendar UI remain outside the current implementation scope.
