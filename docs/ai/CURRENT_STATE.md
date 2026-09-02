@@ -529,3 +529,20 @@ Phase 2F is limited to Appointment Foundation. Conflict detection, reschedule, c
 - Functional commit: `e1e7df1531c63a8b0355abd1b7b9b249c779fcd5` — `feat(api): implement phase2h schedule availability`.
 - Validation completed: Vitest 26 files / 209 tests, workspace TypeScript typecheck, workspace ESLint, and `git diff --check` all passed.
 - Fresh PostgreSQL migration execution was not performed because `psql` is not installed in the current environment.
+
+
+## 2026-09-02 — Phase 2J Booking Rules Foundation
+
+- Added `booking_rules` with tenant scope and optional branch, provider, service, appointment type, and resource references.
+- Added non-negative `advance_booking_days` and `minimum_notice_minutes` constraints.
+- Added tenant-aware foreign keys for all booking-rule references.
+- Added GET/POST `/api/v1/booking-rules`.
+- Added dedicated `booking_rule:read` and `booking_rule:manage` permissions.
+- Tenant and authenticated branch isolation are enforced.
+- Booking rule reference validation prevents cross-tenant references.
+- Appointment type references target the Phase 2I appointment type catalog rather than the legacy `appointments.appointment_type` field.
+- Booking rule creation records the authenticated actor through a transactional audit event.
+- Validation completed: targeted booking-rule suite 10/10 tests passed; full Vitest suite 28 files / 229 tests passed; workspace TypeScript typecheck, ESLint, and `git diff --check` all passed.
+- Fresh PostgreSQL migration execution was not performed because `psql` and `pg_isready` are not installed in the current environment.
+- Out of scope for Phase 2J: slot calculation, conflict detection, booking engine, waitlist, recurring appointments, online booking, notifications, calendar UI, and applying booking rules to appointment lifecycle operations.
+- Phase 2J functional implementation is ready for commit; documentation commit will follow the functional recovery point.

@@ -596,3 +596,14 @@ Appointment types are modeled as tenant-bound catalog records with an optional b
 Each appointment type carries a stable code, human-readable name, optional description, active state, and creation timestamp. Appointment type codes are unique within a tenant, and branch references are tenant-aware.
 
 Phase 2I establishes the appointment type catalog without changing the existing `appointments.appointment_type` field. Existing appointment compatibility is therefore preserved while later scheduling phases can decide when and how appointments should reference the catalog.
+
+
+### 059 — Booking Rules Are Tenant-Bound Scheduling Configuration
+
+Booking rules are modeled as tenant-bound scheduling configuration with optional branch, provider, service, appointment type, and resource scope.
+
+Booking rules reference the Phase 2I appointment type catalog through a tenant-aware foreign key. They do not modify the existing `appointments.appointment_type` field.
+
+Rule thresholds are constrained to non-negative values for advance booking days and minimum notice minutes. All referenced records must belong to the same tenant, and branch-context users remain restricted to their authenticated branch.
+
+Phase 2J establishes the booking-rule foundation only. Rule evaluation, slot calculation, conflict prevention, booking execution, waitlist behavior, recurring appointments, online booking, notifications, and appointment lifecycle integration remain later scheduling concerns.
