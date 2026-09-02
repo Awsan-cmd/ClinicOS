@@ -20,7 +20,8 @@
     "./patients": "./src/patients.ts",
     "./staff": "./src/staff.ts",
     "./services": "./src/services.ts",
-    "./calendar": "./src/calendar.ts"
+    "./calendar": "./src/calendar.ts",
+    "./appointments": "./src/appointments.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

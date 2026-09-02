@@ -24,6 +24,10 @@ import {
   handleServices,
 } from "./routes/services.js";
 import {
+  handleAppointments,
+  handleCreateAppointment,
+} from "./routes/appointments.js";
+import {
   handleCreateResource,
   handleResources,
 } from "./routes/resources.js";
@@ -168,6 +172,44 @@ async function route(
     );
 
     await handleCreateProvider(
+      request,
+      response,
+      pool,
+      context,
+    );
+    return;
+  }
+
+  if (
+    method === "GET" &&
+    url.pathname === "/api/v1/appointments"
+  ) {
+    await requireAuthenticatedRequest(
+      pool,
+      request.headers,
+      context,
+    );
+
+    await handleAppointments(
+      request,
+      response,
+      pool,
+      context,
+    );
+    return;
+  }
+
+  if (
+    method === "POST" &&
+    url.pathname === "/api/v1/appointments"
+  ) {
+    await requireAuthenticatedRequest(
+      pool,
+      request.headers,
+      context,
+    );
+
+    await handleCreateAppointment(
       request,
       response,
       pool,
