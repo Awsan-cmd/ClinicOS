@@ -16,6 +16,7 @@
     "./staff": "./src/staff.ts",
     "./service": "./src/service.ts",
     "./calendar": "./src/calendar.ts",
+    "./schedule": "./src/schedule.ts",
     "./appointment": "./src/appointment.ts"
   }
 }

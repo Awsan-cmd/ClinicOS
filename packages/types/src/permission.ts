@@ -17,6 +17,12 @@ export type Permission =
   | "resource:manage"
   | "availability:read"
   | "availability:manage"
+  | "working_hours:read"
+  | "working_hours:manage"
+  | "schedule_break:read"
+  | "schedule_break:manage"
+  | "holiday:read"
+  | "holiday:manage"
   | "patient:read"
   | "patient:manage"
   | "appointment:read"
@@ -49,6 +55,12 @@ export const ROLE_PERMISSIONS: Readonly<
     "resource:manage",
     "availability:read",
     "availability:manage",
+    "working_hours:read",
+    "working_hours:manage",
+    "schedule_break:read",
+    "schedule_break:manage",
+    "holiday:read",
+    "holiday:manage",
     "patient:read",
     "patient:manage",
     "appointment:read",
@@ -77,6 +89,12 @@ export const ROLE_PERMISSIONS: Readonly<
     "resource:manage",
     "availability:read",
     "availability:manage",
+    "working_hours:read",
+    "working_hours:manage",
+    "schedule_break:read",
+    "schedule_break:manage",
+    "holiday:read",
+    "holiday:manage",
     "patient:read",
     "patient:manage",
     "appointment:read",
@@ -102,6 +120,12 @@ export const ROLE_PERMISSIONS: Readonly<
     "resource:manage",
     "availability:read",
     "availability:manage",
+    "working_hours:read",
+    "working_hours:manage",
+    "schedule_break:read",
+    "schedule_break:manage",
+    "holiday:read",
+    "holiday:manage",
     "patient:read",
     "patient:manage",
     "appointment:read",
@@ -118,6 +142,9 @@ export const ROLE_PERMISSIONS: Readonly<
     "service:read",
     "resource:read",
     "availability:read",
+    "working_hours:read",
+    "schedule_break:read",
+    "holiday:read",
     "patient:read",
     "patient:manage",
     "appointment:read",
@@ -132,6 +159,9 @@ export const ROLE_PERMISSIONS: Readonly<
     "service:read",
     "resource:read",
     "availability:read",
+    "working_hours:read",
+    "schedule_break:read",
+    "holiday:read",
     "patient:read",
     "patient:manage",
     "appointment:read",
@@ -144,6 +174,9 @@ export const ROLE_PERMISSIONS: Readonly<
     "service:read",
     "resource:read",
     "availability:read",
+    "working_hours:read",
+    "schedule_break:read",
+    "holiday:read",
     "patient:read",
     "patient:manage",
     "appointment:read",

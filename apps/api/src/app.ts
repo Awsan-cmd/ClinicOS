@@ -44,6 +44,14 @@ import {
   handleCreatePatient,
   handlePatients,
 } from "./routes/patient-access.js";
+import {
+  handleCreateHoliday,
+  handleCreateScheduleBreak,
+  handleCreateWorkingHours,
+  handleHolidays,
+  handleScheduleBreaks,
+  handleWorkingHours,
+} from "./routes/schedule.js";
 
 async function route(
   request: IncomingMessage,
@@ -391,6 +399,120 @@ async function route(
     );
 
     await handleCreateAvailabilityRule(
+      request,
+      response,
+      pool,
+      context,
+    );
+    return;
+  }
+
+  if (
+    method === "GET" &&
+    url.pathname === "/api/v1/working-hours"
+  ) {
+    await requireAuthenticatedRequest(
+      pool,
+      request.headers,
+      context,
+    );
+
+    await handleWorkingHours(
+      request,
+      response,
+      pool,
+      context,
+    );
+    return;
+  }
+
+  if (
+    method === "POST" &&
+    url.pathname === "/api/v1/working-hours"
+  ) {
+    await requireAuthenticatedRequest(
+      pool,
+      request.headers,
+      context,
+    );
+
+    await handleCreateWorkingHours(
+      request,
+      response,
+      pool,
+      context,
+    );
+    return;
+  }
+
+  if (
+    method === "GET" &&
+    url.pathname === "/api/v1/schedule-breaks"
+  ) {
+    await requireAuthenticatedRequest(
+      pool,
+      request.headers,
+      context,
+    );
+
+    await handleScheduleBreaks(
+      request,
+      response,
+      pool,
+      context,
+    );
+    return;
+  }
+
+  if (
+    method === "POST" &&
+    url.pathname === "/api/v1/schedule-breaks"
+  ) {
+    await requireAuthenticatedRequest(
+      pool,
+      request.headers,
+      context,
+    );
+
+    await handleCreateScheduleBreak(
+      request,
+      response,
+      pool,
+      context,
+    );
+    return;
+  }
+
+  if (
+    method === "GET" &&
+    url.pathname === "/api/v1/holidays"
+  ) {
+    await requireAuthenticatedRequest(
+      pool,
+      request.headers,
+      context,
+    );
+
+    await handleHolidays(
+      request,
+      response,
+      pool,
+      context,
+    );
+    return;
+  }
+
+  if (
+    method === "POST" &&
+    url.pathname === "/api/v1/holidays"
+  ) {
+    await requireAuthenticatedRequest(
+      pool,
+      request.headers,
+      context,
+    );
+
+    await handleCreateHoliday(
       request,
       response,
       pool,

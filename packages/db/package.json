@@ -21,6 +21,7 @@
     "./staff": "./src/staff.ts",
     "./services": "./src/services.ts",
     "./calendar": "./src/calendar.ts",
+    "./schedule": "./src/schedule.ts",
     "./appointments": "./src/appointments.ts"
   },
   "scripts": {
