@@ -543,6 +543,6 @@ Phase 2F is limited to Appointment Foundation. Conflict detection, reschedule, c
 - Appointment type references target the Phase 2I appointment type catalog rather than the legacy `appointments.appointment_type` field.
 - Booking rule creation records the authenticated actor through a transactional audit event.
 - Validation completed: targeted booking-rule suite 10/10 tests passed; full Vitest suite 28 files / 229 tests passed; workspace TypeScript typecheck, ESLint, and `git diff --check` all passed.
-- Fresh PostgreSQL migration execution was not performed because `psql` and `pg_isready` are not installed in the current environment.
+- Fresh PostgreSQL migration runtime verification completed successfully after installing PostgreSQL 18.6 locally: all migrations `0001_initial_tenancy` through `0016_booking_rules` applied successfully with `runMigrations()` against the `clinicos` database on port `5433`; 16 applied, 0 skipped.
 - Out of scope for Phase 2J: slot calculation, conflict detection, booking engine, waitlist, recurring appointments, online booking, notifications, calendar UI, and applying booking rules to appointment lifecycle operations.
-- Phase 2J functional implementation is ready for commit; documentation commit will follow the functional recovery point.
+- Phase 2J functional implementation and documentation are complete; PostgreSQL migration runtime verification is confirmed.
