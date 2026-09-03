@@ -6,9 +6,9 @@ Phase 2L — Availability Slot Calculation.
 
 ## Verified Recovery Point
 
-- Latest verified functional commit: `f1a5a73c23344b223f5a3823b1983faba7ad1d93` — `feat(api): implement phase2i appointment type management`.
-- Latest repository documentation commit: pending — this documentation update.
-- Phase 2L availability implementation is currently present as uncommitted working-tree changes.
+- Latest verified functional commit: `f6f708d7ed66e4d43065fa4ddaecadc41729c051` — `feat(api): implement phase2l availability slot calculation`.
+- Latest repository documentation commit: this update.
+- Phase 2L availability implementation is committed and pushed.
 - Phase 1 device-session enforcement and revocation foundations are implemented.
 - Required device-session enforcement helper is implemented.
 - Full test suite currently validates the Phase 1 platform foundation.
@@ -176,7 +176,7 @@ Validation:
 - Workspace ESLint passed.
 - `git diff --check` passed.
 
-Phase 2L implementation remains uncommitted locally pending final diff review and repository recovery-point creation.
+Phase 2L implementation and validation are complete; recovery point: `f6f708d7ed66e4d43065fa4ddaecadc41729c051`.
 
 ## Documentation System
 
@@ -209,9 +209,9 @@ Documentation is updated as part of the implementation workflow before significa
 ## Current Recovery Point
 
 - `main` is synchronized with `origin/main`.
-- Latest commit: `f1a5a73c23344b223f5a3823b1983faba7ad1d93` (`feat(api): implement phase2i appointment type management`).
-- Working tree was clean after the Phase 2I functional commit.
-- `LOCAL_HEAD == REMOTE_HEAD` verified after the Phase 2I push.
+- Latest commit: `f6f708d7ed66e4d43065fa4ddaecadc41729c051` (`feat(api): implement phase2l availability slot calculation`).
+- Working tree was clean after the Phase 2L functional commit.
+- `LOCAL_HEAD == REMOTE_HEAD` verified after the Phase 2L push.
 - The previous `af166c9`, `c2f9ee1`, and `ca5d32b` commits remain historical recovery points.
 
 ## Latest API Request Context Hardening
@@ -232,7 +232,7 @@ Documentation is updated as part of the implementation workflow before significa
 
 - Verified: 2026-09-02
 - Branch: `main`
-- Current recovery point is the verified Phase 2I Appointment Type Management commit: `f1a5a73c23344b223f5a3823b1983faba7ad1d93`.
+- Current recovery point is the verified Phase 2L Availability Slot Calculation commit: `f6f708d7ed66e4d43065fa4ddaecadc41729c051`.
 - Phase 2A Staff, Phase 2B Providers, Phase 2C Services, Phase 2D Patients, Phase 2E Calendar Foundation, Phase 2F Appointment Foundation, Phase 2G Appointment Lifecycle, and Phase 2H Schedule Availability are implemented.
 - Patient database migration: `database/migrations/0008_patients.sql`
 - Patient branch-integrity migration: `database/migrations/0011_patients_tenant_branch_fk.sql`
@@ -600,3 +600,21 @@ Phase 2F is limited to Appointment Foundation. Conflict detection, reschedule, c
 - Out of scope for Phase 2K: slot calculation, working-hours enforcement, break/holiday enforcement, booking-rule evaluation, waitlist, recurring appointments, online booking, notifications, calendar UI, patient double-booking rules, buffer time, and overbooking exceptions.
 - Appointment lifecycle transitions remain unchanged; conflict prevention applies only to appointment creation and reschedule.
 - Phase 2K conflict prevention implementation and PostgreSQL migration verification are complete.
+
+## 2026-09-03 — Phase 2L Availability Slot Calculation
+
+- Added tenant-scoped availability slot calculation for a branch, provider, and service over a requested date range.
+- Availability respects active services, provider branch membership, working hours, active holidays, schedule breaks, booking-rule notice/advance limits, and scheduled/confirmed provider conflicts.
+- Optional appointment type and resource context are supported when resolving applicable booking rules and resource conflicts.
+- Resource references are tenant-scoped and branch-scoped.
+- Added authenticated `GET /api/v1/availability` with `availability:read` authorization and branch-context enforcement.
+- Added API regression coverage for authentication, permission, successful availability queries, required inputs, invalid dates, reversed ranges, and branch isolation.
+- Targeted availability suite: 7 tests passed.
+- Full Vitest suite: 29 test files / 238 tests passed.
+- Workspace TypeScript typecheck passed.
+- Workspace ESLint passed.
+- `git diff --check` passed.
+- Fresh PostgreSQL verification confirmed migration/runtime compatibility and direct availability behavior for booking-rule notice/advance constraints.
+- Availability slot construction currently uses UTC conversion; timezone-aware clinic-local slot calculation remains outside this slice.
+- Out of scope for Phase 2L: waitlist, recurring appointments, online booking, notifications, calendar UI, and broader booking-engine/lifecycle integration.
+- Phase 2L implementation, validation, commit, and push are complete; recovery point: `f6f708d7ed66e4d43065fa4ddaecadc41729c051`.
