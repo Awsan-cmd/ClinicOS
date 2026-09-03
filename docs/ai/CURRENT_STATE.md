@@ -2,12 +2,13 @@
 
 ## Current Stage
 
-Phase 2I — Appointment Type Management.
+Phase 2L — Availability Slot Calculation.
 
 ## Verified Recovery Point
 
 - Latest verified functional commit: `f1a5a73c23344b223f5a3823b1983faba7ad1d93` — `feat(api): implement phase2i appointment type management`.
 - Latest repository documentation commit: pending — this documentation update.
+- Phase 2L availability implementation is currently present as uncommitted working-tree changes.
 - Phase 1 device-session enforcement and revocation foundations are implemented.
 - Required device-session enforcement helper is implemented.
 - Full test suite currently validates the Phase 1 platform foundation.
@@ -147,6 +148,35 @@ Phase 2I — Appointment Type Management.
   - Workspace ESLint passed.
   - `git diff --check` passed.
 - Functional recovery point: `f1a5a73c23344b223f5a3823b1983faba7ad1d93`.
+
+
+## Phase 2L — Availability Slot Calculation
+
+- Added availability slot calculation through the database availability query.
+- Availability is scoped to the authenticated tenant and requested branch.
+- Provider branch membership is enforced through the provider's staff-member branch.
+- Services must belong to the authenticated tenant and be active; branch-scoped services must match the requested branch.
+- Working hours, schedule breaks, and full-day holidays are applied to slot generation.
+- Active booking rules are resolved by the most specific matching branch/provider/service/appointment-type/resource scope.
+- `minimum_notice_minutes` and `advance_booking_days` are applied when calculating returned slots.
+- Existing scheduled and confirmed provider appointments remove overlapping slots.
+- When a resource is requested, the resource must be active, tenant-scoped, and belong to the requested branch; overlapping scheduled and confirmed resource appointments remove the slot.
+- Added `GET /api/v1/availability`.
+- Availability API requires `availability:read`.
+- Authenticated branch context prevents availability requests for another branch.
+- Invalid, incomplete, and reversed availability date ranges return API `400`.
+- Direct PostgreSQL verification confirmed that `minimum_notice_minutes` and `advance_booking_days` affect returned availability.
+- Provider/resource cross-branch behavior was not claimed as an end-to-end PostgreSQL integration scenario because the verification database did not contain the required multi-branch resource fixtures.
+
+Validation:
+
+- Targeted availability route suite: 7 tests passed.
+- Full Vitest suite: 29 test files / 238 tests passed.
+- Workspace TypeScript typecheck passed.
+- Workspace ESLint passed.
+- `git diff --check` passed.
+
+Phase 2L implementation remains uncommitted locally pending final diff review and repository recovery-point creation.
 
 ## Documentation System
 

@@ -24,7 +24,8 @@
     "./schedule": "./src/schedule.ts",
     "./appointments": "./src/appointments.ts",
     "./appointment-types": "./src/appointment-types.ts",
-    "./booking-rules": "./src/booking-rules.ts"
+    "./booking-rules": "./src/booking-rules.ts",
+    "./availability": "./src/availability.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

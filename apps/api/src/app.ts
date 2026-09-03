@@ -52,6 +52,7 @@ import {
   handleCreatePatient,
   handlePatients,
 } from "./routes/patient-access.js";
+import { handleAvailability } from "./routes/availability.js";
 import {
   handleCreateHoliday,
   handleCreateScheduleBreak,
@@ -445,6 +446,25 @@ async function route(
     );
 
     await handleCreateResource(
+      request,
+      response,
+      pool,
+      context,
+    );
+    return;
+  }
+
+  if (
+    method === "GET" &&
+    url.pathname === "/api/v1/availability"
+  ) {
+    await requireAuthenticatedRequest(
+      pool,
+      request.headers,
+      context,
+    );
+
+    await handleAvailability(
       request,
       response,
       pool,

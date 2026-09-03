@@ -974,3 +974,42 @@ Verified:
 Phase 2B remains limited to Provider management. Services, Calendar, Scheduling, and Appointment lifecycle work remain outside this phase.
 
 Current verified recovery point will be established after the final Phase 2B documentation, diff review, commit, push, and remote verification.
+
+## 2026-09-03 — Phase 2L Availability Slot Calculation
+
+Implemented the Availability Slot Calculation slice.
+
+Added:
+
+- database-backed availability slot calculation
+- tenant and branch-scoped availability evaluation
+- provider branch validation through the provider's staff-member branch
+- active service and branch-scope validation
+- working-hours slot generation
+- schedule-break exclusion
+- full-day holiday exclusion
+- booking-rule selection by matching scope specificity
+- `minimum_notice_minutes` enforcement
+- `advance_booking_days` enforcement
+- provider conflict exclusion for scheduled and confirmed appointments
+- optional resource validation and conflict exclusion
+- `GET /api/v1/availability`
+- `availability:read` authorization
+- authenticated branch-context enforcement
+- availability input and date-range validation
+- API regression coverage for authentication, authorization, input validation, and branch boundaries
+
+PostgreSQL verification:
+
+- Direct PostgreSQL verification confirmed that `minimum_notice_minutes` and `advance_booking_days` affect returned availability.
+- The verification database did not contain the multi-branch resource fixtures required for an end-to-end provider/resource cross-branch integration test, so that scenario is not claimed as integration-verified.
+
+Validation:
+
+- Availability route tests: 7 passed.
+- Full Vitest suite: 29 test files / 238 tests passed.
+- Workspace TypeScript typecheck passed.
+- Workspace ESLint passed.
+- `git diff --check` passed.
+
+Phase 2L implementation is currently uncommitted pending final diff review and repository recovery-point creation.
