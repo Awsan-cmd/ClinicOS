@@ -214,3 +214,74 @@ export async function createBookingRule(
     client.release();
   }
 }
+
+export type FindApplicableBookingRuleInput = {
+  tenantId: string;
+  branchId?: string;
+  providerId: string;
+  serviceId: string;
+  appointmentTypeId?: string;
+  resourceId?: string;
+};
+
+export async function findApplicableBookingRule(
+  pool: Pool,
+  input: FindApplicableBookingRuleInput,
+): Promise<BookingRuleRecord | null> {
+  const result = await pool.query<BookingRuleRecord>(
+    `
+      SELECT
+        id,
+        tenant_id AS "tenantId",
+        branch_id AS "branchId",
+        provider_id AS "providerId",
+        service_id AS "serviceId",
+        appointment_type_id AS "appointmentTypeId",
+        resource_id AS "resourceId",
+        advance_booking_days AS "advanceBookingDays",
+        minimum_notice_minutes AS "minimumNoticeMinutes",
+        is_active AS "isActive",
+        created_at AS "createdAt"
+      FROM booking_rules
+      WHERE tenant_id = $1
+        AND is_active = TRUE
+        AND (branch_id = $2 OR branch_id IS NULL)
+        AND (provider_id = $3 OR provider_id IS NULL)
+        AND (service_id = $4 OR service_id IS NULL)
+        AND (
+          ($5::uuid IS NULL AND appointment_type_id IS NULL)
+          OR (
+            $5::uuid IS NOT NULL
+            AND (appointment_type_id = $5 OR appointment_type_id IS NULL)
+          )
+        )
+        AND (
+          ($6::uuid IS NULL AND resource_id IS NULL)
+          OR (
+            $6::uuid IS NOT NULL
+            AND (resource_id = $6 OR resource_id IS NULL)
+          )
+        )
+      ORDER BY
+        (
+          CASE WHEN branch_id IS NOT NULL THEN 1 ELSE 0 END +
+          CASE WHEN provider_id IS NOT NULL THEN 1 ELSE 0 END +
+          CASE WHEN service_id IS NOT NULL THEN 1 ELSE 0 END +
+          CASE WHEN appointment_type_id IS NOT NULL THEN 1 ELSE 0 END +
+          CASE WHEN resource_id IS NOT NULL THEN 1 ELSE 0 END
+        ) DESC,
+        id ASC
+      LIMIT 1
+    `,
+    [
+      input.tenantId,
+      input.branchId ?? null,
+      input.providerId,
+      input.serviceId,
+      input.appointmentTypeId ?? null,
+      input.resourceId ?? null,
+    ],
+  );
+
+  return result.rows[0] ?? null;
+}
