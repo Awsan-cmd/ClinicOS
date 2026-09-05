@@ -494,6 +494,11 @@ describe("Appointment API security boundary", () => {
         rowCount: 1,
         rows: [{ id: "service-1" }],
       })
+      // no applicable booking rule
+      .mockResolvedValueOnce({
+        rowCount: 0,
+        rows: [],
+      })
       // appointment insert
       .mockResolvedValueOnce({
         rowCount: 1,
@@ -555,7 +560,7 @@ describe("Appointment API security boundary", () => {
         },
       });
 
-      const auditCall = pool.client.query.mock.calls[6]!;
+      const auditCall = pool.client.query.mock.calls[7]!;
 
       expect(auditCall[0]).toContain(
         "INSERT INTO audit_events",
@@ -572,6 +577,180 @@ describe("Appointment API security boundary", () => {
         ]),
       );
     } finally {
+      await stopServer(server);
+    }
+  });
+
+  it("rejects appointment creation when minimum notice is not satisfied", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-09-01T10:00:00.000Z"));
+
+    const pool = createAuthenticatedPool("admin");
+
+    pool.client.query
+      .mockResolvedValueOnce({
+        rowCount: null,
+        rows: [],
+      })
+      .mockResolvedValueOnce({
+        rowCount: 1,
+        rows: [{ id: "branch-1" }],
+      })
+      .mockResolvedValueOnce({
+        rowCount: 1,
+        rows: [{ id: "patient-1" }],
+      })
+      .mockResolvedValueOnce({
+        rowCount: 1,
+        rows: [{ id: "provider-1" }],
+      })
+      .mockResolvedValueOnce({
+        rowCount: 1,
+        rows: [{ id: "service-1" }],
+      })
+      // applicable booking rule: 60 minutes minimum notice
+      .mockResolvedValueOnce({
+        rowCount: 1,
+        rows: [
+          {
+            id: "rule-1",
+            tenantId: "tenant-1",
+            branchId: "branch-1",
+            providerId: "provider-1",
+            serviceId: "service-1",
+            appointmentTypeId: null,
+            resourceId: null,
+            advanceBookingDays: 30,
+            minimumNoticeMinutes: 60,
+            isActive: true,
+            createdAt: new Date("2026-09-01T09:00:00.000Z"),
+          },
+        ],
+      })
+      // ROLLBACK
+      .mockResolvedValueOnce({
+        rowCount: null,
+        rows: [],
+      });
+
+    const { server, url } = await startServer(pool);
+
+    try {
+      const response = await fetch(`${url}/api/v1/appointments`, {
+        method: "POST",
+        headers: {
+          authorization: "Bearer test-session-token",
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          ...validAppointment,
+          startsAt: "2026-09-01T10:30:00.000Z",
+          endsAt: "2026-09-01T11:00:00.000Z",
+        }),
+      });
+
+      expect(response.status).toBe(400);
+
+      await expect(response.json()).resolves.toMatchObject({
+        data: {
+          error: {
+            code: "bad_request",
+            message:
+              "The appointment time does not satisfy the applicable booking rule.",
+          },
+        },
+      });
+
+      expect(pool.client.query).toHaveBeenCalledTimes(7);
+    } finally {
+      vi.useRealTimers();
+      await stopServer(server);
+    }
+  });
+
+  it("rejects appointment creation when advance booking limit is exceeded", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-09-01T10:00:00.000Z"));
+
+    const pool = createAuthenticatedPool("admin");
+
+    pool.client.query
+      .mockResolvedValueOnce({
+        rowCount: null,
+        rows: [],
+      })
+      .mockResolvedValueOnce({
+        rowCount: 1,
+        rows: [{ id: "branch-1" }],
+      })
+      .mockResolvedValueOnce({
+        rowCount: 1,
+        rows: [{ id: "patient-1" }],
+      })
+      .mockResolvedValueOnce({
+        rowCount: 1,
+        rows: [{ id: "provider-1" }],
+      })
+      .mockResolvedValueOnce({
+        rowCount: 1,
+        rows: [{ id: "service-1" }],
+      })
+      // applicable booking rule: 7 days maximum advance booking
+      .mockResolvedValueOnce({
+        rowCount: 1,
+        rows: [
+          {
+            id: "rule-1",
+            tenantId: "tenant-1",
+            branchId: "branch-1",
+            providerId: "provider-1",
+            serviceId: "service-1",
+            appointmentTypeId: null,
+            resourceId: null,
+            advanceBookingDays: 7,
+            minimumNoticeMinutes: 60,
+            isActive: true,
+            createdAt: new Date("2026-09-01T09:00:00.000Z"),
+          },
+        ],
+      })
+      // ROLLBACK
+      .mockResolvedValueOnce({
+        rowCount: null,
+        rows: [],
+      });
+
+    const { server, url } = await startServer(pool);
+
+    try {
+      const response = await fetch(`${url}/api/v1/appointments`, {
+        method: "POST",
+        headers: {
+          authorization: "Bearer test-session-token",
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          ...validAppointment,
+          startsAt: "2026-09-08T10:00:01.000Z",
+          endsAt: "2026-09-08T10:30:01.000Z",
+        }),
+      });
+
+      expect(response.status).toBe(400);
+
+      await expect(response.json()).resolves.toMatchObject({
+        data: {
+          error: {
+            code: "bad_request",
+            message:
+              "The appointment time does not satisfy the applicable booking rule.",
+          },
+        },
+      });
+
+      expect(pool.client.query).toHaveBeenCalledTimes(7);
+    } finally {
+      vi.useRealTimers();
       await stopServer(server);
     }
   });
@@ -1041,6 +1220,11 @@ describe("Appointment API security boundary", () => {
           },
         ],
       })
+      // no applicable booking rule
+      .mockResolvedValueOnce({
+        rowCount: 0,
+        rows: [],
+      })
       // audit insert
       .mockResolvedValueOnce({
         rowCount: 1,
@@ -1103,7 +1287,7 @@ describe("Appointment API security boundary", () => {
         "branch-1",
       ]);
 
-      const auditCall = pool.client.query.mock.calls[2]!;
+      const auditCall = pool.client.query.mock.calls[3]!;
       expect(auditCall[0]).toContain(
         "INSERT INTO audit_events",
       );
@@ -1118,6 +1302,198 @@ describe("Appointment API security boundary", () => {
         ]),
       );
     } finally {
+      await stopServer(server);
+    }
+  });
+
+  it("rejects rescheduling when minimum notice is not satisfied", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-09-01T10:00:00.000Z"));
+
+    const pool = createAuthenticatedPool("admin");
+
+    pool.client.query
+      .mockResolvedValueOnce({
+        rowCount: null,
+        rows: [],
+      })
+      .mockResolvedValueOnce({
+        rowCount: 1,
+        rows: [
+          {
+            id: "appointment-1",
+            tenant_id: "tenant-1",
+            branch_id: "branch-1",
+            patient_id: "patient-1",
+            provider_id: "provider-1",
+            service_id: "service-1",
+            resource_id: "resource-1",
+            appointment_type: "consultation",
+            status: "scheduled",
+            starts_at: new Date("2026-09-03T11:00:00.000Z"),
+            ends_at: new Date("2026-09-03T11:30:00.000Z"),
+            notes: "follow-up",
+            created_at: new Date("2026-09-01T12:00:00.000Z"),
+            previous_status: "scheduled",
+            previous_starts_at: new Date("2026-09-02T10:00:00.000Z"),
+            previous_ends_at: new Date("2026-09-02T10:30:00.000Z"),
+          },
+        ],
+      })
+      // applicable booking rule: 60 minutes minimum notice
+      .mockResolvedValueOnce({
+        rowCount: 1,
+        rows: [
+          {
+            id: "rule-1",
+            tenantId: "tenant-1",
+            branchId: "branch-1",
+            providerId: "provider-1",
+            serviceId: "service-1",
+            appointmentTypeId: null,
+            resourceId: null,
+            advanceBookingDays: 30,
+            minimumNoticeMinutes: 60,
+            isActive: true,
+            createdAt: new Date("2026-09-01T09:00:00.000Z"),
+          },
+        ],
+      })
+      // ROLLBACK
+      .mockResolvedValueOnce({
+        rowCount: null,
+        rows: [],
+      });
+
+    const { server, url } = await startServer(pool);
+
+    try {
+      const response = await fetch(
+        `${url}/api/v1/appointments/appointment-1/reschedule`,
+        {
+          method: "POST",
+          headers: {
+            authorization: "Bearer test-session-token",
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            startsAt: "2026-09-01T10:30:00.000Z",
+            endsAt: "2026-09-01T11:00:00.000Z",
+          }),
+        },
+      );
+
+      expect(response.status).toBe(400);
+
+      await expect(response.json()).resolves.toMatchObject({
+        data: {
+          error: {
+            code: "bad_request",
+            message:
+              "The appointment time does not satisfy the applicable booking rule.",
+          },
+        },
+      });
+
+      expect(pool.client.query).toHaveBeenCalledTimes(4);
+    } finally {
+      vi.useRealTimers();
+      await stopServer(server);
+    }
+  });
+
+  it("rejects rescheduling when advance booking limit is exceeded", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-09-01T10:00:00.000Z"));
+
+    const pool = createAuthenticatedPool("admin");
+
+    pool.client.query
+      .mockResolvedValueOnce({
+        rowCount: null,
+        rows: [],
+      })
+      .mockResolvedValueOnce({
+        rowCount: 1,
+        rows: [
+          {
+            id: "appointment-1",
+            tenant_id: "tenant-1",
+            branch_id: "branch-1",
+            patient_id: "patient-1",
+            provider_id: "provider-1",
+            service_id: "service-1",
+            resource_id: "resource-1",
+            appointment_type: "consultation",
+            status: "scheduled",
+            starts_at: new Date("2026-09-03T11:00:00.000Z"),
+            ends_at: new Date("2026-09-03T11:30:00.000Z"),
+            notes: "follow-up",
+            created_at: new Date("2026-09-01T12:00:00.000Z"),
+            previous_status: "scheduled",
+            previous_starts_at: new Date("2026-09-02T10:00:00.000Z"),
+            previous_ends_at: new Date("2026-09-02T10:30:00.000Z"),
+          },
+        ],
+      })
+      // applicable booking rule: 7 days maximum advance booking
+      .mockResolvedValueOnce({
+        rowCount: 1,
+        rows: [
+          {
+            id: "rule-1",
+            tenantId: "tenant-1",
+            branchId: "branch-1",
+            providerId: "provider-1",
+            serviceId: "service-1",
+            appointmentTypeId: null,
+            resourceId: null,
+            advanceBookingDays: 7,
+            minimumNoticeMinutes: 60,
+            isActive: true,
+            createdAt: new Date("2026-09-01T09:00:00.000Z"),
+          },
+        ],
+      })
+      // ROLLBACK
+      .mockResolvedValueOnce({
+        rowCount: null,
+        rows: [],
+      });
+
+    const { server, url } = await startServer(pool);
+
+    try {
+      const response = await fetch(
+        `${url}/api/v1/appointments/appointment-1/reschedule`,
+        {
+          method: "POST",
+          headers: {
+            authorization: "Bearer test-session-token",
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            startsAt: "2026-09-08T10:00:01.000Z",
+            endsAt: "2026-09-08T10:30:01.000Z",
+          }),
+        },
+      );
+
+      expect(response.status).toBe(400);
+
+      await expect(response.json()).resolves.toMatchObject({
+        data: {
+          error: {
+            code: "bad_request",
+            message:
+              "The appointment time does not satisfy the applicable booking rule.",
+          },
+        },
+      });
+
+      expect(pool.client.query).toHaveBeenCalledTimes(4);
+    } finally {
+      vi.useRealTimers();
       await stopServer(server);
     }
   });

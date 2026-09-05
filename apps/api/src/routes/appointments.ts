@@ -357,6 +357,18 @@ export async function handleCreateAppointment(
       );
     }
 
+    if (
+      message === "booking_rule_minimum_notice" ||
+      message === "booking_rule_advance_booking" ||
+      message === "booking_rule_invalid_start"
+    ) {
+      throw new ApiError(
+        400,
+        "bad_request",
+        "The appointment time does not satisfy the applicable booking rule.",
+      );
+    }
+
     throw error;
   }
 }
@@ -608,6 +620,18 @@ export async function handleRescheduleAppointment(
         409,
         "conflict",
         "The appointment cannot be rescheduled from its current state.",
+      );
+    }
+
+    if (
+      message === "booking_rule_minimum_notice" ||
+      message === "booking_rule_advance_booking" ||
+      message === "booking_rule_invalid_start"
+    ) {
+      throw new ApiError(
+        400,
+        "bad_request",
+        "The appointment time does not satisfy the applicable booking rule.",
       );
     }
 

@@ -6,6 +6,7 @@ import type {
   AppointmentType,
 } from "@clinicos/types/appointment";
 import { createAuditEvent } from "./audit.js";
+import { validateBookingRuleTiming } from "./booking-rules.js";
 
 export type FindAppointmentsInput = {
   tenantId: string;
@@ -193,6 +194,18 @@ export async function createAppointment(
         throw new Error("appointment_resource_not_found");
       }
     }
+
+    await validateBookingRuleTiming(client, {
+      tenantId: input.tenantId,
+      ...(input.branchId ? { branchId: input.branchId } : {}),
+      providerId: input.providerId,
+      serviceId: input.serviceId,
+      ...(input.appointmentType
+        ? { appointmentTypeId: input.appointmentType }
+        : {}),
+      ...(input.resourceId ? { resourceId: input.resourceId } : {}),
+      startsAt: input.startsAt,
+    });
 
     const result = await client.query(
       `
@@ -471,6 +484,10 @@ export async function rescheduleAppointment(
         WITH current_appointment AS (
           SELECT
             id,
+            provider_id,
+            service_id,
+            appointment_type,
+            resource_id,
             status AS previous_status,
             starts_at AS previous_starts_at,
             ends_at AS previous_ends_at
@@ -509,6 +526,10 @@ export async function rescheduleAppointment(
         )
         SELECT
           updated_appointment.*,
+          current_appointment.provider_id,
+          current_appointment.service_id,
+          current_appointment.appointment_type,
+          current_appointment.resource_id,
           current_appointment.previous_status,
           current_appointment.previous_starts_at,
           current_appointment.previous_ends_at
@@ -529,6 +550,20 @@ export async function rescheduleAppointment(
     if (result.rowCount !== 1) {
       throw new Error("appointment_reschedule_not_allowed");
     }
+
+    const current = result.rows[0];
+
+    await validateBookingRuleTiming(client, {
+      tenantId: input.tenantId,
+      ...(input.branchId ? { branchId: input.branchId } : {}),
+      providerId: current.provider_id,
+      serviceId: current.service_id,
+      appointmentTypeId: current.appointment_type ?? undefined,
+      ...(current.resource_id
+        ? { resourceId: current.resource_id }
+        : {}),
+      startsAt: input.startsAt,
+    });
 
     const appointment = mapAppointment(result.rows[0]);
 

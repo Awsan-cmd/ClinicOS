@@ -1,4 +1,4 @@
-import type { Pool } from "pg";
+import type { Pool, PoolClient } from "pg";
 import { randomUUID } from "node:crypto";
 import type { BookingRuleRecord } from "@clinicos/types/booking-rule";
 import { createAuditEvent } from "./audit.js";
@@ -225,7 +225,7 @@ export type FindApplicableBookingRuleInput = {
 };
 
 export async function findApplicableBookingRule(
-  pool: Pool,
+  pool: Pool | PoolClient,
   input: FindApplicableBookingRuleInput,
 ): Promise<BookingRuleRecord | null> {
   const result = await pool.query<BookingRuleRecord>(
@@ -284,4 +284,44 @@ export async function findApplicableBookingRule(
   );
 
   return result.rows[0] ?? null;
+}
+
+export type ValidateBookingRuleTimingInput =
+  FindApplicableBookingRuleInput & {
+    startsAt: string;
+    now?: Date;
+  };
+
+export async function validateBookingRuleTiming(
+  pool: Pool | PoolClient,
+  input: ValidateBookingRuleTimingInput,
+): Promise<void> {
+  const rule = await findApplicableBookingRule(pool, input);
+
+  if (!rule) {
+    return;
+  }
+
+  const startsAt = new Date(input.startsAt);
+  const now = input.now ?? new Date();
+
+  if (Number.isNaN(startsAt.getTime())) {
+    throw new Error("booking_rule_invalid_start");
+  }
+
+  const minimumNoticeAt = new Date(
+    now.getTime() + rule.minimumNoticeMinutes * 60_000,
+  );
+
+  if (startsAt < minimumNoticeAt) {
+    throw new Error("booking_rule_minimum_notice");
+  }
+
+  const maximumBookingAt = new Date(
+    now.getTime() + rule.advanceBookingDays * 24 * 60 * 60_000,
+  );
+
+  if (startsAt > maximumBookingAt) {
+    throw new Error("booking_rule_advance_booking");
+  }
 }
